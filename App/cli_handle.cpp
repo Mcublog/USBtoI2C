@@ -10,12 +10,18 @@
 #include <inttypes.h>
 #include "application.h"
 
+//---------------------- Log control -------------------------------------------
 #define LOG_MODULE_NAME cli
-#if defined(LOG_LEVEL_CLI)
-#define LOG_MODULE_LEVEL LOG_LEVEL_CLI
+#if defined(NDEBUG)
+#define LOG_MODULE_LEVEL (3)
+#else
+#define LOG_MODULE_LEVEL (3)
 #endif
 #include "log_libs.h"
-
+//------------------------------------------------------------------------------
+#define INPUT_BUFFER_MAX_SIZE (32)
+static char buff[INPUT_BUFFER_MAX_SIZE] = {0};
+static uint8_t pos = 0;
 static void ShellHelpCmd(void);
 
 static const textToCmd_t textToCmdList[] =
@@ -38,12 +44,7 @@ static const textToCmd_t textToCmdList[] =
 
 void CliReadTaskFunc(void)
 {
-    static char buff[32] = {0};
-    static uint8_t pos = 0;
-
-    // for (;;)
-    // {
-    int8_t key = LogLibsGetChar();
+    int8_t key = buff[pos];
     if (key > 0)
     {
         if (((char)key == '\n') && (pos != 0))
@@ -60,9 +61,9 @@ void CliReadTaskFunc(void)
         {
             buff[pos++] = key;
         }
+        else
+          pos = 0;
     }
-    // vTaskDelay(100);
-    // }
 }
 
 /**
@@ -105,4 +106,11 @@ void ShellHelpCmd(void)
     {
         LOG_RAW_INFO("%s %s\n\r", textToCmdList[i].cmdTextP, textToCmdList[i].cmdDecrP);
     }
+}
+
+void CliPutToBuf(const uint8_t data)
+{
+    if (pos >= INPUT_BUFFER_MAX_SIZE)
+        return;
+    buff[pos++] = data;
 }

@@ -1,7 +1,7 @@
 {
     "configurations": [
         {
-            "name": "Win32",
+            "name": "F401",
             "includePath": [
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/CubeMX/STM32F401CxUx/Core/Inc",
@@ -12,8 +12,6 @@
                 "${workspaceFolder}/CubeMX/STM32F401CxUx/Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc",
                 "${workspaceFolder}/CubeMX/STM32F401CxUx/Middlewares/ST/STM32_USB_Device_Library/Core/Inc",
                 "${workspaceFolder}/App",
-                "${workspaceFolder}/ks2_libs",
-                "${workspaceFolder}/ks2_libs/RTT",
                 "${workspaceFolder}/CubeMX/STM32F401CxUx/Drivers/CMSIS/Device/ST/STM32F4xx/Include",
                 "${workspaceFolder}/CubeMX/STM32F401CxUx/Drivers/CMSIS/Include"
             ],
@@ -28,8 +26,7 @@
             ],
             "cStandard": "c17",
             "cppStandard": "c++17",
-            "intelliSenseMode": "gcc-arm",
-            "compilerPath": "C:/msys64/mingw64/bin/g++.exe"
+            "intelliSenseMode": "gcc-arm"
         }
     ],
     "version": 4

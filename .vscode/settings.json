@@ -1,4 +1,5 @@
 {
+    "C_Cpp.errorSquiggles": "Disabled",
     "files.associations": {
         "log_libs.h": "c"
     }
