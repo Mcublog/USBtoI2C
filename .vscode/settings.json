@@ -2,5 +2,13 @@
     "C_Cpp.errorSquiggles": "Disabled",
     "files.associations": {
         "log_libs.h": "c"
-    }
+    },
+    "SES_PROJECT_NAME": "USBtoI2C",
+    "SES_PROJECT_F401": "${config:SES_PROJECT_NAME}F401",
+    "SES_PROJECT_F407": "${config:SES_PROJECT_NAME}F407",
+    "command-runner.commands": {
+        "Open: SES": "emStudio SES/${config:SES_PROJECT_NAME}.emProject &",
+        // "Open: CubeMx": "./STM32CubeMX &",
+        "Open: RTT Viewer": "JLinkRTTViewer &"
+    },
 }

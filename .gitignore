@@ -4,3 +4,8 @@ CubeMX/STM32F401CxUx/startup_stm32f401xc.s
 CubeMX/STM32F401CxUx/.mxproject
 CubeMX/STM32F401CxUx/STM32F401CCUx_FLASH.ld
 CubeMX/STM32F401CxUx/Makefile
+CubeMX/STM32F407VE/Makefile
+CubeMX/STM32F407VE/*.s
+CubeMX/STM32F407VE/.mxproject
+CubeMX/STM32F407VE/*.ld
+SES/*.jlink
