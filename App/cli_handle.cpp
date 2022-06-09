@@ -138,26 +138,49 @@ static const textToCmd_t textToCmdList[] =
 
 void CliReadTaskFunc(void)
 {
-    int8_t key = buff[pos];
-    if (key > 0)
+    static bool first = true;
+    if (first)
     {
-        if (((char)key == '\n') && (pos != 0))
+        uint32_t Trials = 10;
+        uint32_t Timeout = 200;
+        uint8_t data[I2C_MAX_DATA_SIZE];
+        int data_index = 0;
+        for (uint16_t addr = 0; addr <= 0xFF; ++addr)
         {
-            // new string
-            buff[pos] = '\0';
-            pos = 0;
-            if (!CliParse(buff, textToCmdList, sizeof(textToCmdList) / sizeof(*textToCmdList)))
+            if (HAL_I2C_IsDeviceReady(&hi2c1, addr, Trials, Timeout) ==
+                HAL_OK)
             {
-                LOG_WARNING("Wrong cmd! Help: -h");
+                data[data_index++] = addr;
             }
         }
-        else if (pos < (sizeof(buff) - 1))
+        if (data_index)
         {
-            buff[pos++] = key;
+            // LOG_HEXDUMP_INFO(data, data_index);
+            Print_hex_array(data, data_index);
         }
         else
-          pos = 0;
+        {
+            LOG_RAW_INFO("not found!\r\n");
+        }
     }
+    int key = scanf("%s", buff);
+    if (key > 0)
+    {
+        // new string
+        // buff[pos] = '\0';
+        // pos = 0;
+        if (!CliParse(buff, textToCmdList,
+                      sizeof(textToCmdList) / sizeof(*textToCmdList)))
+        {
+            LOG_WARNING("Wrong cmd! Help: -h");
+        }
+        //}
+        // else if (pos < (sizeof(buff) - 1))
+        //{
+        //    buff[pos++] = key;
+        //}
+    }
+    // HAL_Delay(1);
 }
 
 /**
@@ -194,9 +217,9 @@ bool CliParse(const char *msgP, const textToCmd_t *table, size_t tableLen)
  */
 void ShellHelpCmd(void)
 {
-    LOG_INFO("Shell commands:");
+    LOG_INFO("Shell commands: %d:  %d", sizeof(textToCmdList), sizeof(*textToCmdList));
 
-    for (size_t i = 0; i < sizeof(textToCmdList) / sizeof(*textToCmdList); ++i)
+    for (int i = 0; i < (sizeof(textToCmdList) / sizeof(*textToCmdList)); ++i)
     {
         LOG_RAW_INFO("%s %s\n\r", textToCmdList[i].cmdTextP, textToCmdList[i].cmdDecrP);
     }

@@ -1,0 +1,61 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "shell",
+			"label": "Build: debug",
+			"command": [
+				"emBuild -config Debug -project ${config:SES_PROJECT_F407} ./SES/${config:SES_PROJECT_NAME}.emProject"
+			],
+			"presentation": {
+				"reveal": "always",
+				"echo": false
+			},
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		},
+		{
+			"type": "shell",
+			"label": "Build: release",
+			"command": [
+				"emBuild -config Release -project ${config:ses_project} ${config:ses_project}.emProject -verbose"
+			],
+			"presentation": {
+				"reveal": "always",
+				"echo": false
+			},
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		},
+		{
+			"type": "shell",
+			"label": "Build: clean all",
+			"command": [
+				"emBuild -config Debug -clean Ws_project.emProject;",
+				"emBuild -config Release -clean Ws_project.emProject;"
+			],
+			"presentation": {
+				"reveal": "never",
+				"echo": true
+			},
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		},
+		{
+			"label": "Flash: debug",
+			"type": "shell",
+			"dependsOn": "Build: debug",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"command": "./utils/flash.ps1"
+		}
+	]
+}

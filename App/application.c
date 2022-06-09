@@ -30,6 +30,7 @@ void LED_set(bool state)
 
 void application(void)
 {
+    LED_set(false);
     while (1)
     {
         CliReadTaskFunc();

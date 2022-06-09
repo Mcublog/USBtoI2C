@@ -13,7 +13,7 @@ typedef struct
 {
     const char* cmdTextP;
     const char* cmdDecrP;
-    bool (*func)(const char*/*text*/);
+    bool (*func)(const char*);
 } textToCmd_t;
 
 void CliReadTaskFunc(void);

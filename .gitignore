@@ -9,3 +9,6 @@ CubeMX/STM32F407VE/*.s
 CubeMX/STM32F407VE/.mxproject
 CubeMX/STM32F407VE/*.ld
 SES/*.jlink
+.vscode/*.log
+.vscode/.cortex-debug.peripherals.state.json
+.vscode/.cortex-debug.registers.state.json
