@@ -9,18 +9,18 @@
             "request": "launch",
             "name": "Debug J-Link",
             "cwd": "${workspaceRoot}",
-            "executable": "${workspaceRoot}/SES/Output/Debug/Exe/${config:SES_PROJECT_F407}.hex",
+            "executable": "${workspaceRoot}/SES/Output/Debug/Exe/${config:SES_PROJECT_F407}.elf",
             "servertype": "jlink",
             "device": "STM32F407VE",
             "interface": "swd",
             "serialNumber": "", //If you have more than one J-Link probe, add the serial number here.
             "runToEntryPoint": "main",
-            "svdFile": "${workspaceRoot}/Svd/STM32F407.svd",
+            "svdFile": "${workspaceRoot}/SVD/STM32F407.svd",
             "breakAfterReset": true,
             "serverArgs": [
                 "-gui"
             ],
-            "preLaunchTask": "Build: debug"
+            "preLaunchTask": "Flash: debug"
         }
     ]
 }

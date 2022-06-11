@@ -1,16 +1,26 @@
-#include "cli_handle.h"
-
+/**
+ * @file cli_handle.cpp
+ * @author Viacheslav (slava.k@ks2corp.com)
+ * @brief
+ * @version 0.1
+ * @date 2022-06-10
+ *
+ * @copyright KS2 Copyright (c) 2022
+ *
+ */
+#include <algorithm>
+#include <array>
 #include <cstdlib>
 #include <cstring>
 #include <inttypes.h>
-
-#include "config.h"
-#include "main.h"
 #include <stdio.h>
-#include <inttypes.h>
-#include "application.h"
-#include "string.h"
+#include <string.h>
 
+#include "application.h"
+#include "cli_handle.h"
+#include "config.h"
+#include "ses_retarget.h"
+#include "main.h"
 //---------------------- Log control -------------------------------------------
 #define LOG_MODULE_NAME cli
 #if defined(NDEBUG)
@@ -21,7 +31,8 @@
 #include "log_libs.h"
 //------------------------------------------------------------------------------
 #define INPUT_BUFFER_MAX_SIZE (32)
-static char buff[INPUT_BUFFER_MAX_SIZE] = {0};
+static std::array<char, INPUT_BUFFER_MAX_SIZE> buff;
+
 static uint8_t pos = 0;
 static void ShellHelpCmd(void);
 static void Print_HAL_err(HAL_StatusTypeDef err)
@@ -48,139 +59,159 @@ static void Print_hex_array(uint8_t *data, size_t size)
 {
     for (int i = 0; i < size; ++i)
     {
-        LOG_RAW_INFO("%x ", data[i]);
+        LOG_RAW_INFO("%#x ", data[i]);
     }
     LOG_RAW_INFO("\r\n");
 }
 
-static const textToCmd_t textToCmdList[] =
-    {
-        {"-h", "Print this help", [](const char *text) -> bool
-         { ShellHelpCmd(); return true; }},
-        {"-led", "[on/off] led ctrl", [](const char *text) -> bool
+static const textToCmd_t textToCmdList[] = {
+    {"-h", "Print this help",
+     [](const char *text) -> bool {
+         ShellHelpCmd();
+         return true;
+     }},
+    {"-led", "[on/off] led ctrl",
+     [](const char *text) -> bool {
+         bool result = false;
+         if (strstr(text, "on"))
          {
-             bool result = false;
-             if (strstr(text, "on"))
+             LED_set(true);
+             result = true;
+         }
+         else if (strstr(text, "off"))
+         {
+             LED_set(false);
+             result = true;
+         }
+         return result;
+     }},
+    {"-r", "[DevAddress] [MemAddress] [MemAddSize] [Size] read i2c registers",
+     [](const char *text) -> bool {
+         uint16_t DevAddress;
+         uint16_t MemAddress;
+         uint16_t MemAddSize;
+         uint8_t data[I2C_MAX_DATA_SIZE];
+         uint16_t Size;
+         uint32_t Timeout = 1000;
+         HAL_StatusTypeDef err;
+         int sscanf_res = sscanf(text, "%hx %hx %hd %hd", &DevAddress, &MemAddress,
+                                 &MemAddSize, &Size);
+         if (sscanf_res < 4)
+         {
+             return false;
+         }
+         DevAddress = DevAddress
+                      << 1; // must be shifted to the left before calling the interface
+         err = HAL_I2C_Mem_Read(&I2C_INSTANSE, DevAddress, MemAddress, MemAddSize, data,
+                                Size, Timeout);
+         if (err == HAL_OK)
+         {
+             // LOG_HEXDUMP_INFO(data, Size);
+             Print_hex_array(data, Size);
+         }
+         else
+         {
+             Print_HAL_err(err);
+         }
+         return true;
+     }},
+    {"-w", "[DevAddress] [MemAddress] [MemAddSize] [Data] write one i2c register",
+     [](const char *text) -> bool {
+         uint16_t DevAddress;
+         uint16_t MemAddress;
+         uint16_t MemAddSize;
+         uint8_t data[I2C_MAX_DATA_SIZE];
+         uint16_t Size;
+         uint32_t Timeout = 1000;
+         HAL_StatusTypeDef err;
+         int sscanf_res =
+             sscanf(text, "%hx %hx %hd %hd", &DevAddress, &MemAddress, &MemAddSize, data);
+         if (sscanf_res < 4)
+         {
+             return false;
+         }
+         DevAddress = DevAddress
+                      << 1; // must be shifted to the left before calling the interface
+         err = HAL_I2C_Mem_Write(&I2C_INSTANSE, DevAddress, MemAddress, MemAddSize, data,
+                                 1, Timeout);
+         Print_HAL_err(err);
+         return true;
+     }},
+    {"-s", "[Trials] [Timeout] scan i2c bus",
+     [](const char *text) -> bool {
+         uint32_t Trials;
+         uint32_t Timeout;
+         uint8_t data[I2C_MAX_DATA_SIZE];
+         int data_index = 0;
+         int sscanf_res = sscanf(text, "%d %d", &Trials, &Timeout);
+         if (sscanf_res < 2)
+         {
+             return false;
+         }
+         for (uint16_t addr = 0; addr <= I2C_MAX_DATA_SIZE; ++addr)
+         {
+             if (HAL_I2C_IsDeviceReady(&I2C_INSTANSE, addr << 1, Trials, Timeout) == HAL_OK)
              {
-                 LED_set(true);
-                 result = true;
+                 data[data_index++] = addr;
              }
-             else if (strstr(text, "off"))
-             {
-                 LED_set(false);
-                 result = true;
-             }
-             return result;
-         }},
-        {"-r", "[DevAddress] [MemAddress] [MemAddSize] [Size] read i2c registers", [](const char *text) -> bool
+         }
+         if (data_index)
          {
-            uint16_t DevAddress;
-            uint16_t MemAddress;
-            uint16_t MemAddSize;
-            uint8_t data[I2C_MAX_DATA_SIZE];
-            uint16_t Size;
-            uint32_t Timeout = 1000;
-            HAL_StatusTypeDef err;
-            int sscanf_res = sscanf(text, "%hx %hx %hd %hd", &DevAddress, &MemAddress, &MemAddSize, &Size);
-            if(sscanf_res < 4) {
-                return false;
-            }
-            DevAddress = DevAddress << 1; // must be shifted to the left before calling the interface
-            err = HAL_I2C_Mem_Read(&I2C_INSTANSE, DevAddress, MemAddress, MemAddSize, data, Size, Timeout);
-            if (err == HAL_OK) {
-                // LOG_HEXDUMP_INFO(data, Size);
-                Print_hex_array(data, Size);
-            }else {
-                Print_HAL_err(err);
-            }
-            return true; }},
-        {"-w", "[DevAddress] [MemAddress] [MemAddSize] [Data] write one i2c register", [](const char *text) -> bool
+             // LOG_HEXDUMP_INFO(data, data_index);
+             Print_hex_array(data, data_index);
+         }
+         else
          {
-            uint16_t DevAddress;
-            uint16_t MemAddress;
-            uint16_t MemAddSize;
-            uint8_t data[I2C_MAX_DATA_SIZE];
-            uint16_t Size;
-            uint32_t Timeout = 1000;
-            HAL_StatusTypeDef err;
-            int sscanf_res = sscanf(text, "%hx %hx %hd %hd", &DevAddress, &MemAddress, &MemAddSize, data);
-            if(sscanf_res < 4) {
-                return false;
-            }
-            DevAddress = DevAddress << 1; // must be shifted to the left before calling the interface
-            err = HAL_I2C_Mem_Write(&I2C_INSTANSE, DevAddress, MemAddress, MemAddSize, data, 1, Timeout);
-            Print_HAL_err(err);
-            return true; }},
-        {"-s", "[Trials] [Timeout] scan i2c bus", [](const char *text) -> bool
-         {
-             uint32_t Trials;
-             uint32_t Timeout;
-             uint8_t data[I2C_MAX_DATA_SIZE];
-             int data_index = 0;
-             int sscanf_res = sscanf(text, "%d %d", &Trials, &Timeout);
-             if(sscanf_res < 2) {
-                return false;
-            }
-            for (uint16_t addr = 0; addr <= 0xff; ++addr) {
-                if (HAL_I2C_IsDeviceReady(&I2C_INSTANSE, (addr << 1), Trials, Timeout) == HAL_OK){
-                    data[data_index++] = addr;
-                }
-            }
-            if (data_index) {
-                // LOG_HEXDUMP_INFO(data, data_index);
-                Print_hex_array(data, data_index);
-            }
-            else {
-                LOG_RAW_INFO("not found!\r\n");
-            }
-            return true; }},
+             LOG_RAW_INFO("not found!\r\n");
+         }
+         return true;
+     }},
 };
+
+static const uint32_t CMD_SIZE = sizeof(textToCmdList) / sizeof(*textToCmdList);
 
 void CliReadTaskFunc(void)
 {
     static bool first = true;
     if (first)
     {
-        uint32_t Trials = 10;
-        uint32_t Timeout = 200;
-        uint8_t data[I2C_MAX_DATA_SIZE];
+        first = false;
+        uint32_t Trials = 2;
+        uint32_t Timeout = 50;
+        std::array<uint8_t, I2C_MAX_DATA_SIZE> data = {0};
         int data_index = 0;
-        for (uint16_t addr = 0; addr <= 0xFF; ++addr)
+        for (uint16_t addr, i = 0; addr <= I2C_MAX_DATA_SIZE; ++addr)
         {
-            if (HAL_I2C_IsDeviceReady(&hi2c1, addr, Trials, Timeout) ==
-                HAL_OK)
+            if (HAL_I2C_IsDeviceReady(&hi2c1, addr << 1, Trials, Timeout) == HAL_OK)
             {
-                data[data_index++] = addr;
+                data[i++] = addr;
             }
         }
-        if (data_index)
+        if (data.front())
         {
-            // LOG_HEXDUMP_INFO(data, data_index);
-            Print_hex_array(data, data_index);
+            for (auto a : data)
+            {
+                if (a)
+                    LOG_RAW_INFO("%#x ", a);
+                else
+                    break;
+            }
+            LOG_RAW_INFO("\r\n");
         }
         else
         {
             LOG_RAW_INFO("not found!\r\n");
         }
     }
-    int key = scanf("%s", buff);
-    if (key > 0)
+    int d = scanf("%[^\n]", buff.data());
+    if (buff.front() != 0)
     {
-        // new string
-        // buff[pos] = '\0';
-        // pos = 0;
-        if (!CliParse(buff, textToCmdList,
-                      sizeof(textToCmdList) / sizeof(*textToCmdList)))
+        if (!CliParse(buff.data(), textToCmdList, CMD_SIZE))
         {
             LOG_WARNING("Wrong cmd! Help: -h");
         }
-        //}
-        // else if (pos < (sizeof(buff) - 1))
-        //{
-        //    buff[pos++] = key;
-        //}
     }
-    // HAL_Delay(1);
+    fflush(stdin);
 }
 
 /**

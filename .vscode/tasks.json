@@ -35,8 +35,8 @@
 			"type": "shell",
 			"label": "Build: clean all",
 			"command": [
-				"emBuild -config Debug -clean Ws_project.emProject;",
-				"emBuild -config Release -clean Ws_project.emProject;"
+				"emBuild -config Debug -clean -project ${config:SES_PROJECT_F407} ./SES/${config:SES_PROJECT_NAME}.emProject;",
+				"emBuild -config Release -clean -project ${config:SES_PROJECT_F407} ./SES/${config:SES_PROJECT_NAME}.emProject;"
 			],
 			"presentation": {
 				"reveal": "never",
