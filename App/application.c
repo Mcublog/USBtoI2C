@@ -1,10 +1,12 @@
-#include "main.h"
+#include <stdbool.h>
+
 #include "application.h"
-#include "log_libs.h"
-#include "config.h"
-#include "usbd_cdc_if.h"
-#include "stdbool.h"
 #include "cli_handle.h"
+#include "config.h"
+#include "log_libs.h"
+#include "main.h"
+#include "usbd_cdc_if.h"
+#include "io_i2c.h"
 
 bool host_com_port_open = false;
 
@@ -30,6 +32,7 @@ void LED_set(bool state)
 
 void application(void)
 {
+    io_i2c_init((void *)&I2C_INSTANSE);
     LED_set(false);
     while (1)
     {
