@@ -15,7 +15,7 @@
             "interface": "swd",
             "serialNumber": "", //If you have more than one J-Link probe, add the serial number here.
             "runToEntryPoint": "main",
-            "svdFile": "${workspaceRoot}/SVD/STM32F407.svd",
+            "svdFile": "${workspaceRoot}/SES/STM32F407.svd",
             "breakAfterReset": true,
             "serverArgs": [
                 "-gui"
