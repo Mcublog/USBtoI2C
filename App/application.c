@@ -7,6 +7,7 @@
 #include "main.h"
 #include "usbd_cdc_if.h"
 #include "io_i2c.h"
+#include "i2c.h"
 
 bool host_com_port_open = false;
 
@@ -32,7 +33,7 @@ void LED_set(bool state)
 
 void application(void)
 {
-    io_i2c_init((void *)&I2C_INSTANSE);
+    io_i2c_init((void *)&hi2c1);
     LED_set(false);
     while (1)
     {
