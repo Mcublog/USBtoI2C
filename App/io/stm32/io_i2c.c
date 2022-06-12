@@ -50,7 +50,7 @@ io_i2c_err_t io_i2c_init(void *pv)
  */
 io_i2c_err_t io_i2c_is_ready(uint8_t adr)
 {
-    if (HAL_I2C_IsDeviceReady(_i2c_handle, (adr << 1), 1, 1) == HAL_OK)
+    if (HAL_I2C_IsDeviceReady(_i2c_handle, (adr << 1), 1, _i2c_timeout_ms) == HAL_OK)
         return IO_I2C_OK;
     return IO_I2C_ERR;
 }

@@ -3,7 +3,8 @@
     "files.associations": {
         "log_libs.h": "c",
         "array": "cpp",
-        "string_view": "cpp"
+        "string_view": "cpp",
+        "config.h": "c"
     },
     "SES_PROJECT_NAME": "USBtoI2C",
     "SES_PROJECT_F401": "${config:SES_PROJECT_NAME}F401",

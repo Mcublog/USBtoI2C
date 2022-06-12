@@ -4,10 +4,9 @@
 #include "cli_handle.h"
 #include "config.h"
 #include "log_libs.h"
-#include "main.h"
 #include "usbd_cdc_if.h"
-#include "io_i2c.h"
-#include "i2c.h"
+#include "sys_common.h"
+#include "io.h"
 
 bool host_com_port_open = false;
 
@@ -26,15 +25,10 @@ void LogLibsPrintCustom(char *buff, int n)
     }
 }
 
-void LED_set(bool state)
-{
-    state ? HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET) : HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
-}
-
 void application(void)
 {
-    io_i2c_init((void *)&hi2c1);
-    LED_set(false);
+    sys_init();
+    io_led_write(true);
     while (1)
     {
         CliReadTaskFunc();

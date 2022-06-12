@@ -22,6 +22,7 @@
 #include "io_i2c.h"
 #include "main.h"
 #include "ses_retarget.h"
+#include "sys_common.h"
 //---------------------- Log control -------------------------------------------
 #define LOG_MODULE_NAME cli
 #if defined(NDEBUG)
@@ -161,7 +162,7 @@ static const textToCmd_t textToCmdList[] = {
                      data[i++] = addr;
                      break;
                  }
-                 //TODO: added delay handling
+                 // sys_delay(Timeout);
              }
          }
          if (data.front())
@@ -176,15 +177,9 @@ static const uint32_t CMD_LIST_SIZE = sizeof(textToCmdList) / sizeof(*textToCmdL
 
 void CliReadTaskFunc(void)
 {
-    int d = scanf("%[^\n]", buff.data());
-    if (buff.front() != 0)
-    {
-        if (!CliParse(buff.data(), textToCmdList, CMD_LIST_SIZE))
-        {
-            LOG_WARNING("Wrong cmd! Help: -h");
-        }
-    }
-    fflush(stdin);
+    scanf("%[^\n]", buff.data());
+    if (!CliParse(buff.data(), textToCmdList, CMD_LIST_SIZE))
+        LOG_WARNING("Wrong cmd! Help: -h");
 }
 
 /**
