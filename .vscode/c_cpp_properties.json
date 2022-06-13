@@ -1,7 +1,7 @@
 {
     "configurations": [
         {
-            "name": "F401",
+            "name": "GreenPill",
             "includePath": [
                 "${workspaceFolder}/CubeMX/STM32F401CxUx/**",
                 "${workspaceFolder}/App/**"
@@ -22,7 +22,7 @@
             "configurationProvider": "ms-vscode.makefile-tools"
         },
         {
-            "name": "F407",
+            "name": "Core407",
             "includePath": [
                 "${workspaceFolder}/CubeMX/STM32F407VE/**",
                 "${workspaceFolder}/App/**"

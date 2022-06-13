@@ -56,6 +56,15 @@
 				"isDefault": true
 			},
 			"command": "./utils/flash.ps1"
-		}
+		},
+        {
+            "label": "Build C++ project",
+            "type": "shell",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "command": "make",
+        },
 	]
 }

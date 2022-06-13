@@ -24,6 +24,7 @@
  */
 IOError IOBus::Initialize(void *ctx)
 {
+    UNUSED(ctx);
     LOG_INFO("I2C bus init");
     return  IOError::kIO_OK;
 }

@@ -99,10 +99,13 @@ static char __SEGGER_RTL_stdin_getc(void)
         c = __SEGGER_RTL_stdin_ungot;
         __SEGGER_RTL_stdin_ungot = EOF;
     }
-    do
+    else
     {
-        r = SEGGER_RTT_Read(stdin->handle, &c, 1);
-    } while (r == 0);
+        do
+        {
+            r = SEGGER_RTT_Read(stdin->handle, &c, 1);
+        } while (r == 0);
+    }
     //
     return c;
 }

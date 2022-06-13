@@ -22,6 +22,8 @@ typedef enum
     kIO_OK
 } IOError;
 
+#define UNUSED(X) (void)X
+
 #ifdef __cplusplus
 }
 #endif

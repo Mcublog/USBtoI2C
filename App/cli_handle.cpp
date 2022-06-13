@@ -39,18 +39,18 @@ static void ShellHelpCmd(void);
 template <typename T, size_t N>
 static void Print_hex_array(std::array<T, N> const &data)
 {
-    for (int i = 0; i < data.size(); i++)
+    for (size_t i = 0; i < data.size(); i++)
     {
-        if (data[i])
-            LOG_RAW_INFO("%#x ", data[i]);
-        break;
+        if (data[i] == 0)
+            break;
+        LOG_RAW_INFO("%#x ", data[i]);
     }
     LOG_RAW_INFO("\r\n");
 }
 
 static void Print_hex_array(uint8_t *data, size_t size)
 {
-    for (int i = 0; i < size; ++i)
+    for (size_t i = 0; i < size; ++i)
     {
         LOG_RAW_INFO("%#x ", data[i]);
     }
@@ -79,6 +79,7 @@ static bool _i2c_read(uint8_t adr, uint8_t regadr, uint8_t regsize,
 static const textToCmd_t textToCmdList[] = {
     {"-h", "Print this help",
      [](const char *text) -> bool {
+         UNUSED(text);
          ShellHelpCmd();
          return true;
      }},
@@ -100,7 +101,6 @@ static const textToCmd_t textToCmdList[] = {
          uint16_t MemAddSize;
          uint8_t data[I2C_MAX_DATA_SIZE];
          uint16_t Size;
-         uint32_t Timeout = 1000;
          if (sscanf(text, "%hx %hx %hd %hd", &DevAddress, &MemAddress,
                     &MemAddSize, &Size) < 4)
          {
@@ -116,9 +116,8 @@ static const textToCmd_t textToCmdList[] = {
          uint16_t DevAddress;
          uint16_t MemAddress;
          uint16_t MemAddSize;
-         uint8_t data[I2C_MAX_DATA_SIZE];
+         uint8_t data[I2C_MAX_DATA_SIZE] = {0};
          uint16_t Size;
-         uint32_t Timeout = 1000;
          int sscanf_res = sscanf(text, "%hx %hx %hd %hd %hd", &DevAddress,
                                  &MemAddress, &MemAddSize, &Size, data);
          if (sscanf_res < 5)
@@ -132,12 +131,12 @@ static const textToCmd_t textToCmdList[] = {
      [](const char *text) -> bool {
          uint32_t Trials;
          uint32_t Timeout;
-         std::array<uint8_t, I2C_MAX_DATA_SIZE> data;
+         std::array<uint8_t, I2C_MAX_DATA_SIZE> data = {0};
          if (sscanf(text, "%d %d", &Trials, &Timeout) < 2)
              return false;
-         for (uint8_t addr, i = 0; addr <= I2C_MAX_DATA_SIZE; ++addr)
+         for (uint8_t addr = 0, i = 0; addr <= I2C_MAX_DATA_SIZE; ++addr)
          {
-             for (int i = 0; i < Trials; ++i)
+             for (uint32_t j = 0; j < Trials; ++j)
              {
                  if (i2c->IsReady(addr) == kIO_OK)
                  {
@@ -169,6 +168,7 @@ void CliReadTaskFunc(void *context)
     scanf("%[^\n]", buff.data());
     if (!CliParse(buff.data(), textToCmdList, CMD_LIST_SIZE))
         LOG_WARNING("Wrong cmd! Help: -h");
+    getchar(); // Clear from buffer last char (flush stdin)
 }
 
 /**
@@ -208,7 +208,7 @@ void ShellHelpCmd(void)
     LOG_INFO("Shell commands: %d:  %d", sizeof(textToCmdList),
              sizeof(*textToCmdList));
 
-    for (int i = 0; i < CMD_LIST_SIZE; ++i)
+    for (uint32_t i = 0; i < CMD_LIST_SIZE; ++i)
     {
         LOG_RAW_INFO("%s %s\n\r", textToCmdList[i].cmdTextP,
                      textToCmdList[i].cmdDecrP);

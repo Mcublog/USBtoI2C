@@ -26,6 +26,7 @@
  */
 IOError SysGpio::Initialize(void *pv)
 {
+    UNUSED(pv);
     LOG_INFO("IO initialized");
     return IOError::kIO_OK;
 }

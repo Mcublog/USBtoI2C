@@ -3,6 +3,7 @@
 #include "config.h"
 #include "application.h"
 #include "cli_handle.h"
+#include "errors.h"
 // #include "usbd_cdc_if.h"
 #if defined(CORE407)
 #include "core407.hpp"
@@ -27,6 +28,8 @@ bool host_com_port_open = false;
 
 void LogLibsPrintCustom(char *buff, int n)
 {
+    UNUSED(buff);
+    UNUSED(n);
     if (!host_com_port_open) {
         return;
     }
