@@ -29,6 +29,8 @@ SystemError System::Initialize(void* ctx)
     LOG_INFO("System init");
     i2c_bus_ = IOBus();
     i2c_bus_.Initialize(nullptr);
+    io_ = SysGpio();
+    io_.Initialize(nullptr);
     return SystemError::kOK;
 }
 
@@ -42,9 +44,24 @@ void System::Delay(int ms)
     LOG_INFO("waiting: %d ms", ms);
 }
 
+/**
+ * @brief Get pointer to I2C bus
+ *
+ * @return IOBus*
+ */
 IOBus *System::GetI2CBus()
 {
     return &i2c_bus_;
+}
+
+/**
+ * @brief Get the IO object
+ *
+ * @return IO*
+ */
+SysGpio *System::GetIo()
+{
+    return &io_;
 }
 
 /**

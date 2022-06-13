@@ -6,10 +6,14 @@
 #include "log_libs.h"
 // #include "usbd_cdc_if.h"
 #include "system.hpp"
-#include "io.h"
+//#include "core407.hpp"
+#include "green_pill.hpp"
+//#include "io.h"
 
 bool host_com_port_open = false;
-System sys = System();
+// Core407 sys = Core407();
+GreenPill sys = GreenPill();
+// System sys = System();
 
 void LogLibsPrintCustom(char *buff, int n)
 {
@@ -30,7 +34,7 @@ void LogLibsPrintCustom(char *buff, int n)
 void application(void)
 {
     sys.Initialize(nullptr);
-    io_led_write(true);
+    sys.GetIo()->LedWrite(true);
     while (1)
     {
         CliReadTaskFunc((void*)&sys);

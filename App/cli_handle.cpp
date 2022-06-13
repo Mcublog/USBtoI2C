@@ -63,7 +63,7 @@ static void Print_hex_array(uint8_t *data, size_t size)
 bool _i2c_write(uint8_t adr, uint8_t regadr,
                 uint8_t regsize, uint8_t *data, size_t size)
 {
-    IOBusError err = i2c->Write(adr, regadr, regsize, data, size);
+    IOError err = i2c->Write(adr, regadr, regsize, data, size);
     LOG_ERROR("%s", IOBus::ErrStringify(err));
     return false;
 }
@@ -71,8 +71,8 @@ bool _i2c_write(uint8_t adr, uint8_t regadr,
 static bool _i2c_read(uint8_t adr, uint8_t regadr,
                       uint8_t regsize, uint8_t *data, size_t size)
 {
-    IOBusError err = i2c->Read(adr, regadr, regsize, data, size);
-    if (err == IOBusError::kIO_OK)
+    IOError err = i2c->Read(adr, regadr, regsize, data, size);
+    if (err == IOError::kIO_OK)
         Print_hex_array(data, size);
     else
         LOG_ERROR("%s", IOBus::ErrStringify(err));

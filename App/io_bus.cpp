@@ -22,10 +22,10 @@
  * @brief Initialize I2C bus by default
  *
  */
-IOBusError IOBus::Initialize(void *ctx)
+IOError IOBus::Initialize(void *ctx)
 {
     LOG_INFO("I2C bus init");
-    return  IOBusError::kIO_OK;
+    return  IOError::kIO_OK;
 }
 
 /**
@@ -34,12 +34,12 @@ IOBusError IOBus::Initialize(void *ctx)
  * @param adr
  * @return I2CBusError
  */
-IOBusError IOBus::IsReady(uint8_t adr)
+IOError IOBus::IsReady(uint8_t adr)
 {
     if (adr != kVirtualI2CDeviceAddress)
-        return IOBusError::kIO_ERR;
+        return IOError::kIO_ERR;
     LOG_INFO("Find I2C virtual: %#x", adr);
-    return IOBusError::kIO_OK;
+    return IOError::kIO_OK;
 }
 
 /**
@@ -52,15 +52,15 @@ IOBusError IOBus::IsReady(uint8_t adr)
  * @param len Size of data
  * @return I2CBusError
  */
-IOBusError IOBus::Write(uint8_t adr, uint8_t reg, uint8_t regsize,
-                            uint8_t const *data, uint8_t len)
+IOError IOBus::Write(uint8_t adr, uint8_t reg, uint8_t regsize,
+                            uint8_t *data, uint8_t len)
 {
     LOG_INFO("Write I2C bus: ADR: %#x REG: %#x REGSIZE: %d", adr, reg, regsize);
     LOG_RAW_INFO("DATA[%d]: ", len);
     for (int32_t i = 0; i < len; ++i)
         LOG_RAW_INFO("%#x ", data[i]);
     LOG_RAW_INFO("\n");
-    return IOBusError::kIO_OK;
+    return IOError::kIO_OK;
 }
 
 /**
@@ -74,7 +74,7 @@ IOBusError IOBus::Write(uint8_t adr, uint8_t reg, uint8_t regsize,
  * @return I2CBusError
  * @return I2CBusError
  */
-IOBusError IOBus::Read(uint8_t adr, uint8_t reg, uint8_t regsize,
+IOError IOBus::Read(uint8_t adr, uint8_t reg, uint8_t regsize,
                            uint8_t *data, uint8_t len)
 {
     LOG_INFO("Read I2C bus: ADR: %#x REG: %#x REGSIZE: %d", adr, reg, regsize);
@@ -85,7 +85,7 @@ IOBusError IOBus::Read(uint8_t adr, uint8_t reg, uint8_t regsize,
         LOG_RAW_INFO("%#x ", data[i]);
     }
     LOG_RAW_INFO("\n");
-    return IOBusError::kIO_OK;
+    return IOError::kIO_OK;
 }
 
 /**
@@ -94,7 +94,7 @@ IOBusError IOBus::Read(uint8_t adr, uint8_t reg, uint8_t regsize,
  * @param err
  * @return const char*
  */
-const char *IOBus::ErrStringify(IOBusError err)
+const char *IOBus::ErrStringify(IOError err)
 {
     if (err == kIO_TIMEOUT)
         return "IO_I2C_TIMEOUT";
