@@ -141,7 +141,6 @@ int __SEGGER_RTL_X_file_read(__SEGGER_RTL_FILE *stream, char *s, unsigned len)
     return c;
 }
 
-
 /**
  * @brief  Flush unwritten data to file.
  *
@@ -155,8 +154,10 @@ int __SEGGER_RTL_X_file_flush(__SEGGER_RTL_FILE *stream)
     return 0;
 }
 
-int __SEGGER_RTL_X_file_write(__SEGGER_RTL_FILE *stream, const char *s, unsigned len) {
-return SEGGER_RTT_Write(stream->handle, s, len);
+int __SEGGER_RTL_X_file_write(__SEGGER_RTL_FILE *stream, const char *s,
+                              unsigned len)
+{
+    return SEGGER_RTT_Write(stream->handle, s, len);
 }
 
 int __SEGGER_RTL_X_file_unget(__SEGGER_RTL_FILE *stream, int c)

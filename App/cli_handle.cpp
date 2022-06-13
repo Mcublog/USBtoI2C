@@ -18,11 +18,8 @@
 
 #include "cli_handle.h"
 #include "config.h"
-#include "io_bus.hpp"
-#include "main.h"
-#include "ses_retarget.h"
 #include "system.hpp"
-//---------------------- Log control -------------------------------------------
+//>>---------------------- Log control
 #define LOG_MODULE_NAME cli
 #if defined(NDEBUG)
 #define LOG_MODULE_LEVEL (3)
@@ -30,7 +27,7 @@
 #define LOG_MODULE_LEVEL (3)
 #endif
 #include "log_libs.h"
-//------------------------------------------------------------------------------
+//<<----------------------
 #define INPUT_BUFFER_MAX_SIZE (32)
 static std::array<char, INPUT_BUFFER_MAX_SIZE> buff;
 
@@ -39,12 +36,12 @@ static SysGpio *io = nullptr;
 static uint8_t pos = 0;
 static void ShellHelpCmd(void);
 
-template<typename T, size_t N>
+template <typename T, size_t N>
 static void Print_hex_array(std::array<T, N> const &data)
 {
     for (int i = 0; i < data.size(); i++)
     {
-        if(data[i])
+        if (data[i])
             LOG_RAW_INFO("%#x ", data[i]);
         break;
     }
@@ -60,16 +57,16 @@ static void Print_hex_array(uint8_t *data, size_t size)
     LOG_RAW_INFO("\r\n");
 }
 
-bool _i2c_write(uint8_t adr, uint8_t regadr,
-                uint8_t regsize, uint8_t *data, size_t size)
+bool _i2c_write(uint8_t adr, uint8_t regadr, uint8_t regsize, uint8_t *data,
+                size_t size)
 {
     IOError err = i2c->Write(adr, regadr, regsize, data, size);
     LOG_ERROR("%s", IOBus::ErrStringify(err));
     return false;
 }
 
-static bool _i2c_read(uint8_t adr, uint8_t regadr,
-                      uint8_t regsize, uint8_t *data, size_t size)
+static bool _i2c_read(uint8_t adr, uint8_t regadr, uint8_t regsize,
+                      uint8_t *data, size_t size)
 {
     IOError err = i2c->Read(adr, regadr, regsize, data, size);
     if (err == IOError::kIO_OK)
@@ -113,7 +110,8 @@ static const textToCmd_t textToCmdList[] = {
          return true;
      }},
     {"-w",
-     "[DevAddress] [MemAddress] [MemAddSize] [DataSize] [Data] write one i2c register",
+     "[DevAddress] [MemAddress] [MemAddSize] [DataSize] [Data] write one i2c "
+     "register",
      [](const char *text) -> bool {
          uint16_t DevAddress;
          uint16_t MemAddress;
@@ -157,13 +155,14 @@ static const textToCmd_t textToCmdList[] = {
      }},
 };
 
-static const uint32_t CMD_LIST_SIZE = sizeof(textToCmdList) / sizeof(*textToCmdList);
+static const uint32_t CMD_LIST_SIZE =
+    sizeof(textToCmdList) / sizeof(*textToCmdList);
 
 void CliReadTaskFunc(void *context)
 {
     if (i2c == nullptr)
     {
-        System *sys = (System *) context;
+        System *sys = (System *)context;
         i2c = sys->GetI2CBus();
         io = sys->GetIo();
     }

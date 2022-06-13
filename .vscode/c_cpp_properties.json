@@ -13,7 +13,8 @@
                 "STM32F401xC",
                 "__STM32F4xx_FAMILY",
                 "__STM32F401_SUBFAMILY",
-                "ARM_MATH_CM4"
+                "ARM_MATH_CM4",
+                "GREEN_PILL"
             ],
             "cStandard": "c17",
             "cppStandard": "c++17",
@@ -31,7 +32,8 @@
                 "STM32F407xx",
                 "__STM32F4xx_FAMILY",
                 "__STM32F407_SUBFAMILY",
-                "ARM_MATH_CM4"
+                "ARM_MATH_CM4",
+                "CORE407"
             ],
             "cStandard": "c17",
             "cppStandard": "c++20",
