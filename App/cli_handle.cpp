@@ -18,7 +18,6 @@
 
 #include "cli_handle.h"
 #include "config.h"
-#include "io.h"
 #include "io_bus.hpp"
 #include "main.h"
 #include "ses_retarget.h"
@@ -36,6 +35,7 @@
 static std::array<char, INPUT_BUFFER_MAX_SIZE> buff;
 
 static IOBus *i2c = nullptr;
+static SysGpio *io = nullptr;
 static uint8_t pos = 0;
 static void ShellHelpCmd(void);
 
@@ -89,9 +89,9 @@ static const textToCmd_t textToCmdList[] = {
      [](const char *text) -> bool {
          bool result = true;
          if (strstr(text, "on"))
-             io_led_write(true);
+             io->LedWrite(true);
          else if (strstr(text, "off"))
-             io_led_write(false);
+             io->LedWrite(false);
          else
              result = false;
          return result;
@@ -165,6 +165,7 @@ void CliReadTaskFunc(void *context)
     {
         System *sys = (System *) context;
         i2c = sys->GetI2CBus();
+        io = sys->GetIo();
     }
     scanf("%[^\n]", buff.data());
     if (!CliParse(buff.data(), textToCmdList, CMD_LIST_SIZE))

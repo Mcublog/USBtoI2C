@@ -7,13 +7,12 @@
 // #include "usbd_cdc_if.h"
 #include "system.hpp"
 //#include "core407.hpp"
-#include "green_pill.hpp"
-//#include "io.h"
+//#include "green_pill.hpp"
 
 bool host_com_port_open = false;
 // Core407 sys = Core407();
-GreenPill sys = GreenPill();
-// System sys = System();
+//GreenPill sys = GreenPill();
+System sys = System();
 
 void LogLibsPrintCustom(char *buff, int n)
 {
