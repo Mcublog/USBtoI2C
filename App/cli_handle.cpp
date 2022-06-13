@@ -19,10 +19,10 @@
 #include "cli_handle.h"
 #include "config.h"
 #include "io.h"
-#include "io_i2c.h"
+#include "io_bus.hpp"
 #include "main.h"
 #include "ses_retarget.h"
-#include "sys_common.h"
+#include "system.hpp"
 //---------------------- Log control -------------------------------------------
 #define LOG_MODULE_NAME cli
 #if defined(NDEBUG)
@@ -35,27 +35,9 @@
 #define INPUT_BUFFER_MAX_SIZE (32)
 static std::array<char, INPUT_BUFFER_MAX_SIZE> buff;
 
+static IOBus *i2c = nullptr;
 static uint8_t pos = 0;
 static void ShellHelpCmd(void);
-static void Print_HAL_err(HAL_StatusTypeDef err)
-{
-    switch (err)
-    {
-    case HAL_OK:
-        LOG_RAW_INFO("OK");
-        break;
-    case HAL_ERROR:
-        LOG_RAW_INFO("ERROR");
-        break;
-    case HAL_BUSY:
-        LOG_RAW_INFO("BUSY");
-        break;
-    case HAL_TIMEOUT:
-        LOG_RAW_INFO("TIMEOUT");
-        break;
-    }
-    LOG_RAW_INFO("\r\n");
-}
 
 template<typename T, size_t N>
 static void Print_hex_array(std::array<T, N> const &data)
@@ -78,20 +60,22 @@ static void Print_hex_array(uint8_t *data, size_t size)
     LOG_RAW_INFO("\r\n");
 }
 
-bool _i2c_write(uint8_t adr, uint8_t regadr, uint8_t regsize, uint8_t *data, size_t size)
+bool _i2c_write(uint8_t adr, uint8_t regadr,
+                uint8_t regsize, uint8_t *data, size_t size)
 {
-    io_i2c_err_t err = io_i2c_write(adr, regadr, regsize, data, size);
-    LOG_ERROR("%s", io_i2c_stringify_err(err));
+    IOBusError err = i2c->Write(adr, regadr, regsize, data, size);
+    LOG_ERROR("%s", IOBus::ErrStringify(err));
     return false;
 }
 
-static bool _i2c_read(uint8_t adr, uint8_t regadr, uint8_t regsize, uint8_t *data, size_t size)
+static bool _i2c_read(uint8_t adr, uint8_t regadr,
+                      uint8_t regsize, uint8_t *data, size_t size)
 {
-    io_i2c_err_t err = io_i2c_read(adr, regadr, regsize, data, size);
-    if (err == IO_I2C_OK)
+    IOBusError err = i2c->Read(adr, regadr, regsize, data, size);
+    if (err == IOBusError::kIO_OK)
         Print_hex_array(data, size);
     else
-        LOG_ERROR("%s", io_i2c_stringify_err(err));
+        LOG_ERROR("%s", IOBus::ErrStringify(err));
     return false;
 }
 
@@ -129,7 +113,7 @@ static const textToCmd_t textToCmdList[] = {
          return true;
      }},
     {"-w",
-     "[DevAddress] [MemAddress] [MemAddSize] [Data] write one i2c register",
+     "[DevAddress] [MemAddress] [MemAddSize] [DataSize] [Data] write one i2c register",
      [](const char *text) -> bool {
          uint16_t DevAddress;
          uint16_t MemAddress;
@@ -137,9 +121,9 @@ static const textToCmd_t textToCmdList[] = {
          uint8_t data[I2C_MAX_DATA_SIZE];
          uint16_t Size;
          uint32_t Timeout = 1000;
-         int sscanf_res = sscanf(text, "%hx %hx %hd %hd", &DevAddress,
-                                 &MemAddress, &MemAddSize, data);
-         if (sscanf_res < 4)
+         int sscanf_res = sscanf(text, "%hx %hx %hd %hd %hd", &DevAddress,
+                                 &MemAddress, &MemAddSize, &Size, data);
+         if (sscanf_res < 5)
          {
              return false;
          }
@@ -157,7 +141,7 @@ static const textToCmd_t textToCmdList[] = {
          {
              for (int i = 0; i < Trials; ++i)
              {
-                 if (io_i2c_is_ready(addr) == IO_I2C_OK)
+                 if (i2c->IsReady(addr) == kIO_OK)
                  {
                      data[i++] = addr;
                      break;
@@ -175,8 +159,13 @@ static const textToCmd_t textToCmdList[] = {
 
 static const uint32_t CMD_LIST_SIZE = sizeof(textToCmdList) / sizeof(*textToCmdList);
 
-void CliReadTaskFunc(void)
+void CliReadTaskFunc(void *context)
 {
+    if (i2c == nullptr)
+    {
+        System *sys = (System *) context;
+        i2c = sys->GetI2CBus();
+    }
     scanf("%[^\n]", buff.data());
     if (!CliParse(buff.data(), textToCmdList, CMD_LIST_SIZE))
         LOG_WARNING("Wrong cmd! Help: -h");

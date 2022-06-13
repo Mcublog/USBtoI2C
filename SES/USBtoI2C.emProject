@@ -72,7 +72,6 @@
       Name="Common"
       Target="STM32F401CC"
       arm_architecture="v7EM"
-      arm_compiler_variant="SEGGER"
       arm_core_type="Cortex-M4"
       arm_endian="Little"
       arm_fp_abi="Hard"
