@@ -1,0 +1,26 @@
+{
+    "C_Cpp.errorSquiggles": "Disabled",
+    "files.associations": {
+        "log_libs.h": "c",
+        "array": "cpp",
+        "string_view": "cpp",
+        "config.h": "c"
+    },
+    "SES_PROJECT_NAME": "USBtoI2C",
+    "SES_PROJECT_F401": "${config:SES_PROJECT_NAME}F401",
+    "SES_PROJECT_F407": "${config:SES_PROJECT_NAME}F407",
+    "command-runner.commands": {
+        "Open: SES": "emStudio SES/${config:SES_PROJECT_NAME}.emProject &",
+        // "Open: CubeMx": "./STM32CubeMX &",
+        "Open: RTT Viewer": "JLinkRTTViewer &"
+    },
+    // Set the e-mail address of the author.  Replaces {email}.
+    "doxdocgen.generic.authorEmail": "viacheslav@mcublog.ru",
+    // Set the name of the author.  Replaces {author}.
+    "doxdocgen.generic.authorName": "Viacheslav",
+    "doxdocgen.file.copyrightTag": [
+        "@copyright Mcublog Copyright (c) {year}"
+    ],
+    "C_Cpp.clang_format_fallbackStyle": "{BasedOnStyle: Microsoft, ColumnLimit: 80, IndentWidth: 4}",
+    "diffEditor.ignoreTrimWhitespace": false,
+}

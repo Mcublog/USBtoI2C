@@ -1,0 +1,11 @@
+if SWD
+speed 4000
+Device STM32F407VE
+Con
+r
+h
+loadfile SES/Output/Debug/Exe/USBtoI2CF407.hex
+r
+h
+g
+q

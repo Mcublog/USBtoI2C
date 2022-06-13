@@ -1,0 +1,44 @@
+{
+    "configurations": [
+        {
+            "name": "GreenPill",
+            "includePath": [
+                "${workspaceFolder}/CubeMX/STM32F401CxUx/**",
+                "${workspaceFolder}/App/**"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE",
+                "STM32F401xC",
+                "__STM32F4xx_FAMILY",
+                "__STM32F401_SUBFAMILY",
+                "ARM_MATH_CM4",
+                "GREEN_PILL"
+            ],
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "gcc-arm",
+            "configurationProvider": "ms-vscode.makefile-tools"
+        },
+        {
+            "name": "Core407",
+            "includePath": [
+                "${workspaceFolder}/CubeMX/STM32F407VE/**",
+                "${workspaceFolder}/App/**"
+            ],
+            "defines": [
+                "_DEBUG",
+                "STM32F407xx",
+                "__STM32F4xx_FAMILY",
+                "__STM32F407_SUBFAMILY",
+                "ARM_MATH_CM4",
+                "CORE407"
+            ],
+            "cStandard": "c17",
+            "cppStandard": "c++20",
+            "intelliSenseMode": "gcc-arm"
+        }
+    ],
+    "version": 4
+}
