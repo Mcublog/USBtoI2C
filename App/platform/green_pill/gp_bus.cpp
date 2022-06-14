@@ -9,6 +9,7 @@
  *
  */
 #include "gp_bus.hpp"
+
 #include "i2c.h"
 //>>---------------------- Log control
 #define LOG_MODULE_NAME gpbus
@@ -25,8 +26,7 @@
  * @param err
  * @return IOError
  */
-IOError GpBus::to_iobus_error(int err)
-{
+IOError GpBus::to_iobus_error(int err) {
     if (err == HAL_ERROR)
         return kIO_ERR;
     else if (err == HAL_BUSY)
@@ -42,8 +42,7 @@ IOError GpBus::to_iobus_error(int err)
  * @param ctx
  * @return IOBusError
  */
-IOError GpBus::Initialize(void *ctx)
-{
+IOError GpBus::Initialize(void *ctx) {
     i2c_handle_ = &hi2c1;
     return kIO_OK;
 }
@@ -54,8 +53,7 @@ IOError GpBus::Initialize(void *ctx)
  * @param adr
  * @return IOBusError
  */
-IOError GpBus::IsReady(uint8_t adr)
-{
+IOError GpBus::IsReady(uint8_t adr) {
     HAL_StatusTypeDef err =
         HAL_I2C_IsDeviceReady(i2c_handle_, (adr << 1), 1, kI2CTimeoutMs);
     return GpBus::to_iobus_error(err);
@@ -72,8 +70,7 @@ IOError GpBus::IsReady(uint8_t adr)
  * @return IOBusError
  */
 IOError GpBus::Write(uint8_t adr, uint8_t reg, uint8_t regsize,
-                             uint8_t *data, uint8_t len)
-{
+                     uint8_t *data, uint8_t len) {
     HAL_StatusTypeDef err = HAL_I2C_Mem_Write(
         i2c_handle_, (adr << 1), reg, regsize, data, len, kI2CTimeoutMs);
     return GpBus::to_iobus_error(err);
@@ -90,8 +87,7 @@ IOError GpBus::Write(uint8_t adr, uint8_t reg, uint8_t regsize,
  * @return IOBusError
  */
 IOError GpBus::Read(uint8_t adr, uint8_t reg, uint8_t regsize,
-                            uint8_t *data, uint8_t len)
-{
+                    uint8_t *data, uint8_t len) {
     HAL_StatusTypeDef err = HAL_I2C_Mem_Read(i2c_handle_, (adr << 1), reg,
                                              regsize, data, len, kI2CTimeoutMs);
     return GpBus::to_iobus_error(err);

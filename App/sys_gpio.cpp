@@ -24,8 +24,7 @@
  * @param pv
  * @return IOError
  */
-IOError SysGpio::Initialize(void *pv)
-{
+IOError SysGpio::Initialize(void *pv) {
     UNUSED(pv);
     LOG_INFO("IO initialized");
     return IOError::kIO_OK;
@@ -37,8 +36,7 @@ IOError SysGpio::Initialize(void *pv)
  * @param state
  * @return IOError
  */
-IOError SysGpio::LedWrite(bool state)
-{
+IOError SysGpio::LedWrite(bool state) {
     LOG_INFO("LED write: %d", state);
     return IOError::kIO_OK;
 }

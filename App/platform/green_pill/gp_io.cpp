@@ -9,6 +9,7 @@
  *
  */
 #include "gp_io.hpp"
+
 #include "gpio.h"
 //>>---------------------- Log control
 #define LOG_MODULE_NAME gp_io
@@ -25,8 +26,7 @@
  * @param ctx
  * @return IOError
  */
-IOError GpIO::Initialize(void * ctx)
-{
+IOError GpIO::Initialize(void* ctx) {
     LOG_INFO("Green Pill init");
     return IOError::kIO_OK;
 }
@@ -36,8 +36,7 @@ IOError GpIO::Initialize(void * ctx)
  * @param state
  * @return IOError
  */
-IOError GpIO::LedWrite(bool state)
-{
+IOError GpIO::LedWrite(bool state) {
     GPIO_PinState out = state ? GPIO_PIN_RESET : GPIO_PIN_SET;
     HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, out);
     return IOError::kIO_OK;

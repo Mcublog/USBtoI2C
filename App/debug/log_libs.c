@@ -6,10 +6,9 @@
 
 #define MAX_DEBUG_BUFF_SIZE (128)
 
-static char _buffer[MAX_DEBUG_BUFF_SIZE];// PLACE_IN_COMMON_RAM;
+static char _buffer[MAX_DEBUG_BUFF_SIZE];  // PLACE_IN_COMMON_RAM;
 
-void log_printf(const char *prefix, const char *module, const char * sFormat, ...)
-{
+void log_printf(const char *prefix, const char *module, const char *sFormat, ...) {
     printf("%s> %s: ", prefix, module);
     va_list ParamList;
     va_start(ParamList, sFormat);

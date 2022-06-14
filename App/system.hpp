@@ -2,13 +2,12 @@
 #ifndef APP_SYSTEM_HPP_
 #define APP_SYSTEM_HPP_
 
+#include "errors.h"
 #include "io_bus.hpp"
 #include "sys_gpio.hpp"
-#include "errors.h"
 
-class System
-{
-  public:
+class System {
+   public:
     virtual SystemError Initialize(void *ctx);
     virtual IOBus *GetI2CBus();
     virtual SysGpio *GetIo();
@@ -16,9 +15,9 @@ class System
 
     static const char *ErrStringify(SystemError err);
 
-  private:
+   private:
     IOBus i2c_bus_;
     SysGpio io_;
 };
 
-#endif // APP_SYSTEM_HPP_
+#endif  // APP_SYSTEM_HPP_
