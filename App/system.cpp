@@ -28,9 +28,7 @@ SystemError System::Initialize(void* ctx)
 {
     UNUSED(ctx);
     LOG_INFO("System init");
-    i2c_bus_ = IOBus();
     i2c_bus_.Initialize(nullptr);
-    io_ = SysGpio();
     io_.Initialize(nullptr);
     return SystemError::kOK;
 }

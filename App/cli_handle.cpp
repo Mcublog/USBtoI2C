@@ -8,16 +8,18 @@
  * @copyright KS2 Copyright (c) 2022
  *
  */
-#include <algorithm>
-#include <array>
-#include <cstdlib>
-#include <cstring>
+
 #include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
 
-#include "cli_handle.h"
+#include <algorithm>
+#include <array>
+#include <cstdlib>
+#include <cstring>
+
 #include "config.h"
+#include "cli_handle.h"
 #include "system.hpp"
 //>>---------------------- Log control
 #define LOG_MODULE_NAME cli
@@ -38,10 +40,8 @@ static uint8_t pos = 0;
 static void ShellHelpCmd(void);
 
 template <typename T, size_t N>
-static void Print_hex_array(std::array<T, N> const &data)
-{
-    for (size_t i = 0; i < data.size(); i++)
-    {
+static void Print_hex_array(std::array<T, N> const &data) {
+    for (size_t i = 0; i < data.size(); i++) {
         if (data[i] == 0)
             break;
         LOG_RAW_INFO("%#x ", data[i]);
@@ -49,26 +49,22 @@ static void Print_hex_array(std::array<T, N> const &data)
     LOG_RAW_INFO("\r\n");
 }
 
-static void Print_hex_array(uint8_t *data, size_t size)
-{
-    for (size_t i = 0; i < size; ++i)
-    {
+static void Print_hex_array(uint8_t *data, size_t size) {
+    for (size_t i = 0; i < size; ++i) {
         LOG_RAW_INFO("%#x ", data[i]);
     }
     LOG_RAW_INFO("\r\n");
 }
 
 bool _i2c_write(uint8_t adr, uint8_t regadr, uint8_t regsize, uint8_t *data,
-                size_t size)
-{
+                size_t size) {
     IOError err = i2c->Write(adr, regadr, regsize, data, size);
     LOG_ERROR("%s", IOBus::ErrStringify(err));
     return false;
 }
 
 static bool _i2c_read(uint8_t adr, uint8_t regadr, uint8_t regsize,
-                      uint8_t *data, size_t size)
-{
+                      uint8_t *data, size_t size) {
     IOError err = i2c->Read(adr, regadr, regsize, data, size);
     if (err == IOError::kIO_OK)
         Print_hex_array(data, size);
@@ -103,8 +99,7 @@ static const textToCmd_t textToCmdList[] = {
          uint8_t data[I2C_MAX_DATA_SIZE];
          uint16_t Size;
          if (sscanf(text, "%hx %hx %hd %hd", &DevAddress, &MemAddress,
-                    &MemAddSize, &Size) < 4)
-         {
+                    &MemAddSize, &Size) < 4) {
              return false;
          }
          _i2c_read(DevAddress, MemAddress, MemAddSize, data, Size);
@@ -121,8 +116,7 @@ static const textToCmd_t textToCmdList[] = {
          uint16_t Size;
          int sscanf_res = sscanf(text, "%hx %hx %hd %hd %hd", &DevAddress,
                                  &MemAddress, &MemAddSize, &Size, data);
-         if (sscanf_res < 5)
-         {
+         if (sscanf_res < 5) {
              return false;
          }
          _i2c_write(DevAddress, MemAddress, MemAddSize, data, Size);
@@ -135,16 +129,13 @@ static const textToCmd_t textToCmdList[] = {
          std::array<uint8_t, I2C_MAX_DATA_SIZE> data = {0};
          if (sscanf(text, "%d %d", &Trials, &Timeout) < 2)
              return false;
-         for (uint8_t addr = 0, i = 0; addr <= I2C_MAX_DATA_SIZE; ++addr)
-         {
-             for (uint32_t j = 0; j < Trials; ++j)
-             {
-                 if (i2c->IsReady(addr) == kIO_OK)
-                 {
+         for (uint8_t addr = 0, i = 0; addr <= I2C_MAX_DATA_SIZE; ++addr) {
+             for (uint32_t j = 0; j < Trials; ++j) {
+                 if (i2c->IsReady(addr) == kIO_OK) {
                      data[i++] = addr;
                      break;
                  }
-                 //sys->Delay(5);
+                 //  sys->Delay(5);
              }
          }
          if (data.front())
@@ -158,18 +149,16 @@ static const textToCmd_t textToCmdList[] = {
 static const uint32_t CMD_LIST_SIZE =
     sizeof(textToCmdList) / sizeof(*textToCmdList);
 
-void CliReadTaskFunc(void *context)
-{
-    if (sys == nullptr)
-    {
-        sys = (System *)context;
+void CliReadTaskFunc(void *context) {
+    if (sys == nullptr) {
+        sys = reinterpret_cast<System *>(context);
         i2c = sys->GetI2CBus();
         io = sys->GetIo();
     }
     scanf("%[^\n]", buff.data());
     if (!CliParse(buff.data(), textToCmdList, CMD_LIST_SIZE))
         LOG_WARNING("Wrong cmd! Help: -h");
-    getchar(); // Clear from buffer last char (flush stdin)
+    getchar();  // Clear from buffer last char (flush stdin)
 }
 
 /**
@@ -181,19 +170,16 @@ void CliReadTaskFunc(void *context)
  * @return true
  * @return false
  */
-bool CliParse(const char *msgP, const textToCmd_t *table, size_t tableLen)
-{
-    for (size_t i = 0; i < tableLen; ++i)
-    {
+bool CliParse(const char *msgP, const textToCmd_t *table, size_t tableLen) {
+    for (size_t i = 0; i < tableLen; ++i) {
         size_t len_cmd = strlen(table[i].cmdTextP);
-        if (!strncmp(msgP, table[i].cmdTextP, len_cmd))
-        {
-            if ((msgP[len_cmd] == ' ') || (strlen(msgP) == len_cmd))
+        if (!strncmp(msgP, table[i].cmdTextP, len_cmd)) {
+            if ((msgP[len_cmd] == ' ') || (strlen(msgP) == len_cmd)) {
                 /*get command from table*/
-                if (table[i].func)
-                {
+                if (table[i].func) {
                     return table[i].func(&msgP[strlen(table[i].cmdTextP)]);
                 }
+            }
         }
     }
     /*unknown command*/
@@ -204,20 +190,17 @@ bool CliParse(const char *msgP, const textToCmd_t *table, size_t tableLen)
  * @brief
  *
  */
-void ShellHelpCmd(void)
-{
+void ShellHelpCmd(void) {
     LOG_INFO("Shell commands: %d:  %d", sizeof(textToCmdList),
              sizeof(*textToCmdList));
 
-    for (uint32_t i = 0; i < CMD_LIST_SIZE; ++i)
-    {
+    for (uint32_t i = 0; i < CMD_LIST_SIZE; ++i) {
         LOG_RAW_INFO("%s %s\n\r", textToCmdList[i].cmdTextP,
                      textToCmdList[i].cmdDecrP);
     }
 }
 
-void CliPutToBuf(const uint8_t data)
-{
+void CliPutToBuf(const uint8_t data) {
     if (pos >= INPUT_BUFFER_MAX_SIZE)
         return;
     buff[pos++] = data;
