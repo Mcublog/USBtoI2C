@@ -31,6 +31,7 @@
 #define INPUT_BUFFER_MAX_SIZE (32)
 static std::array<char, INPUT_BUFFER_MAX_SIZE> buff;
 
+static System *sys = nullptr;
 static IOBus *i2c = nullptr;
 static SysGpio *io = nullptr;
 static uint8_t pos = 0;
@@ -143,7 +144,7 @@ static const textToCmd_t textToCmdList[] = {
                      data[i++] = addr;
                      break;
                  }
-                 // sys_delay(Timeout);
+                 //sys->Delay(5);
              }
          }
          if (data.front())
@@ -159,9 +160,9 @@ static const uint32_t CMD_LIST_SIZE =
 
 void CliReadTaskFunc(void *context)
 {
-    if (i2c == nullptr)
+    if (sys == nullptr)
     {
-        System *sys = (System *)context;
+        sys = (System *)context;
         i2c = sys->GetI2CBus();
         io = sys->GetIo();
     }

@@ -30,6 +30,7 @@
       gcc_entry_point="Reset_Handler"
       link_linker_script_file="$(ProjectDir)/STM32F4xx_Flash.icf"
       linker_memory_map_file="$(ProjectDir)/STM32F401CC_MemoryMap.xml"
+      linker_scanf_character_group_matching_enabled="Yes"
       macros="DeviceHeaderFile=$(PackagesDir)/STM32F4xx/CMSIS/Device/Include/stm32f4xx.h;DeviceLibraryIdentifier=M4lf;DeviceSystemFile=$(PackagesDir)/STM32F4xx/CMSIS/Device/Source/system_stm32f4xx.c;DeviceVectorsFile=$(PackagesDir)/STM32F4xx/Source/STM32F401x_Vectors.s;DeviceFamily=STM32F4xx;DeviceSubFamily=STM32F401;Target=STM32F401CC"
       project_directory=""
       project_type="Executable"

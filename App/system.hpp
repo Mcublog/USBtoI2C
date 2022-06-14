@@ -12,8 +12,8 @@ class System
     virtual SystemError Initialize(void *ctx);
     virtual IOBus *GetI2CBus();
     virtual SysGpio *GetIo();
+    virtual void Delay(int ms);
 
-    static void Delay(int ms);
     static const char *ErrStringify(SystemError err);
 
   private:
