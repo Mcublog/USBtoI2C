@@ -82,14 +82,11 @@ static const textToCmd_t textToCmdList[] = {
      }},
     {"-led", "[on/off] led ctrl",
      [](const char *text) -> bool {
-         bool result = true;
-         if (strstr(text, "on"))
-             io->LedWrite(true);
-         else if (strstr(text, "off"))
-             io->LedWrite(false);
-         else
-             result = false;
-         return result;
+         if (!(strstr(text, "on") || strstr(text, "off")))
+             return false;
+         bool state = strstr(text, "on") ? true : false;
+         io->LedWrite(state);
+         return true;
      }},
     {"-r", "[DevAddress] [MemAddress] [MemAddSize] [Size] read i2c registers",
      [](const char *text) -> bool {
