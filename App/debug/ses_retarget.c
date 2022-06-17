@@ -141,6 +141,18 @@ int __SEGGER_RTL_X_file_flush(__SEGGER_RTL_FILE *stream) {
     return 0;
 }
 
+/**
+ * @brief Write data to file
+ *
+ * stdout is directed to RTT buffer #0; stderr is directed to RTT buffer #1;
+ *
+ * @param stream Pointer to file to write to
+ * @param s Pointer to object to write to file
+ * @param len Number of characters to write to the file
+ * @return int
+ * >= 0 - Success
+ *  < 0 - Failure
+ */
 int __SEGGER_RTL_X_file_write(__SEGGER_RTL_FILE *stream, const char *s,
                               unsigned len) {
     return SEGGER_RTT_Write(stream->handle, s, len);
