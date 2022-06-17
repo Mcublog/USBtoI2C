@@ -1,0 +1,3 @@
+[submodule "Ring-Buffer"]
+	path = Ring-Buffer
+	url = git@github.com:Mcublog/Ring-Buffer.git
