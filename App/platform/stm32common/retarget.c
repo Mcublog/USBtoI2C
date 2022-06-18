@@ -53,7 +53,7 @@ int rt_get_char(void *handle, char *c, int len) {
 int rt_put_char(void *handle, char *c, int len) {
 #if STDIO_STREAM == STDIO_USB_CDC
     (void)handle;
-    return CDC_Transmit_FS((uint8_t *)c, len);
+    return CDC_Transmit_FS(c, len);
 #elif STDIO_STREAM == STDIO_RTT
     return SEGGER_RTT_Write((unsigned)handle, c, len);
 #endif

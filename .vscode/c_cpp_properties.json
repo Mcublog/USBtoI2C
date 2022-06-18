@@ -4,7 +4,8 @@
             "name": "GreenPill",
             "includePath": [
                 "${workspaceFolder}/CubeMX/STM32F401CxUx/**",
-                "${workspaceFolder}/App/**"
+                "${workspaceFolder}/App/**",
+                "${workspaceFolder}/**"
             ],
             "defines": [
                 "_DEBUG",
@@ -25,7 +26,8 @@
             "name": "Core407",
             "includePath": [
                 "${workspaceFolder}/CubeMX/STM32F407VE/**",
-                "${workspaceFolder}/App/**"
+                "${workspaceFolder}/App/**",
+                "${workspaceFolder}/**"
             ],
             "defines": [
                 "_DEBUG",

@@ -22,7 +22,6 @@
 #include "usbd_cdc_if.h"
 
 /* USER CODE BEGIN INCLUDE */
-#include "cli_handle.h"
 #include "ringbuffer.h"
 /* USER CODE END INCLUDE */
 
@@ -265,10 +264,7 @@ static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
 {
   /* USER CODE BEGIN 6 */
   USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
-  for (uint32_t cnt = 0; cnt < *Len; cnt++) {
-    ring_buffer_queue(&input_ring, Buf[cnt]);
-    // CliPutToBuf(Buf[cnt]);
-  }
+  ring_buffer_queue_arr(&input_ring, (const char*)Buf, *Len);
   USBD_CDC_ReceivePacket(&hUsbDeviceFS);
   return (USBD_OK);
   /* USER CODE END 6 */

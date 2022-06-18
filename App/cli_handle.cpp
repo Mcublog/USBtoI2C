@@ -152,10 +152,17 @@ void CliReadTaskFunc(void *context) {
         i2c = sys->GetI2CBus();
         io = sys->GetIo();
     }
-    scanf("%[^\n]", buff.data());
-    if (!CliParse(buff.data(), textToCmdList, CMD_LIST_SIZE))
-        LOG_WARNING("Wrong cmd! Help: -h");
-    getchar();  // Clear from buffer last char (flush stdin)
+    scanf("%c", &buff[pos]);
+    if (buff[pos] == '\n') {
+        buff[pos] = '\0';
+        if (!CliParse(buff.data(), textToCmdList, CMD_LIST_SIZE))
+            LOG_WARNING("Wrong cmd! Help: -h");
+        pos = 0;
+    } else {
+        pos++;
+        if (pos == buff.size())
+            pos = 0;
+    }
 }
 
 /**

@@ -18,18 +18,16 @@ struct __SEGGER_RTL_FILE_impl {
     int handle;
 };
 
-// static FILE __SEGGER_RTL_stdin_file = {0};  // stdin reads from RTT buffer #0
-// static FILE __SEGGER_RTL_stdin_file = {0};  // stdin reads from RTT buffer #0
-// static FILE __SEGGER_RTL_stdout_file = {0}; // stdout writes to RTT buffer #0
-// static FILE __SEGGER_RTL_stderr_file = {0}; // stdout writes to RTT buffer #0
+static FILE __SEGGER_RTL_stdin_file = {0};  // stdin reads from RTT buffer #0
+static FILE __SEGGER_RTL_stdout_file = {0}; // stdout writes to RTT buffer #0
+static FILE __SEGGER_RTL_stderr_file = {0}; // stdout writes to RTT buffer #0
 static int __SEGGER_RTL_stdin_ungot = EOF;
 //<<----------------------
 
 //>>---------------------- Public data
-// FILE *stdin = &__SEGGER_RTL_stdin_file;
-// FILE *stdin = &__SEGGER_RTL_stdin_file;
-// FILE *stdout = &__SEGGER_RTL_stdout_file;
-// FILE *stderr = &__SEGGER_RTL_stderr_file;
+FILE *stdin = &__SEGGER_RTL_stdin_file;
+FILE *stdout = &__SEGGER_RTL_stdout_file;
+FILE *stderr = &__SEGGER_RTL_stderr_file;
 //<<----------------------
 
 /**
