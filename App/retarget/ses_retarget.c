@@ -8,16 +8,11 @@
  * @copyright KS2 Copyright (c) 2022
  *
  */
-#include "ses_retarget.h"
-
 #include <stdio.h>
 
+#include "retarget.h"
 #include "RTT/SEGGER_RTT.h"
 #include "__SEGGER_RTL_Int.h"
-#include "ringbuffer.h"
-//>>---------------------- Exported Variables
-extern ring_buffer_t input_ring;
-//<<----------------------
 //>>---------------------- Local declaration
 struct __SEGGER_RTL_FILE_impl {
     int handle;
@@ -97,8 +92,7 @@ static char __SEGGER_RTL_stdin_getc(void) {
         __SEGGER_RTL_stdin_ungot = EOF;
     } else {
         do {
-            r = ring_buffer_dequeue(&input_ring, &c);
-            // r = SEGGER_RTT_Read(stdin->handle, &c, 1);
+            r = rt_get_char((void*)stdin->handle, &c, 1);
         } while (r == 0);
     }
     //
@@ -160,9 +154,7 @@ int __SEGGER_RTL_X_file_flush(__SEGGER_RTL_FILE *stream) {
  */
 int __SEGGER_RTL_X_file_write(__SEGGER_RTL_FILE *stream, const char *s,
                               unsigned len) {
-    // return SEGGER_RTT_Write(stream->handle, s, len);
-    (void)stream;
-    return CDC_Transmit_FS((uint8_t *)s, len);
+    return rt_put_char((void*)stream->handle, (char*)s, len);
 }
 
 int __SEGGER_RTL_X_file_unget(__SEGGER_RTL_FILE *stream, int c) {
