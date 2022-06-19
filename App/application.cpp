@@ -32,7 +32,8 @@ void application(void) {
     ring_buffer_init(&input_ring);
     sys.Initialize(nullptr);
     sys.GetIo()->LedWrite(true);
+    CliInit(&sys);
     while (1) {
-        CliReadTaskFunc((void *)&sys);
+        CliReadTaskFunc();
     }
 }

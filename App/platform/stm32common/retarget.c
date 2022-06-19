@@ -11,7 +11,7 @@
 #include "retarget.h"
 
 #include "config.h"
-
+//TODO: think about this implementation
 #if STDIO_STREAM == STDIO_RTT
 #include "RTT/SEGGER_RTT.h"
 #elif STDIO_STREAM == STDIO_USB_CDC
