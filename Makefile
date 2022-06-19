@@ -11,8 +11,8 @@ EXECUTABLE	:= main
 DEBUG_INC := $(SRC)/debug
 DEBUG_SRC := $(SRC)/debug
 
-LOG_INC := $(DEBUG_INC)/log_libs.h
-LOG_SRC := $(DEBUG_SRC)/log_libs.c
+RING_INC := Ring-Buffer
+RING_SRC := Ring-Buffer
 
 all: $(BIN)/$(EXECUTABLE)
 
@@ -20,8 +20,8 @@ run: clean all
 	clear
 	./$(BIN)/$(EXECUTABLE)
 
-$(BIN)/$(EXECUTABLE): $(SRC)/*.cpp
-	$(CXX) $(CXX_FLAGS) $(LOG_SRC) -I$(INCLUDE) -I$(DEBUG_INC) $(LOG_INC) $^ -o $@ $(LIBRARIES)
+$(BIN)/$(EXECUTABLE): $(SRC)/*.cpp $(RING_SRC)/*.c $(DEBUG_SRC)/*.c
+	$(CXX) $(CXX_FLAGS) -I$(INCLUDE) -I$(DEBUG_INC) -I$(RING_INC) $^ -o $@ $(LIBRARIES)
 
 clean:
 	-rm $(BIN)/*

@@ -8,10 +8,9 @@
  * @copyright KS2 Copyright (c) 2022
  *
  */
-#include "ses_retarget.h"
-
 #include <stdio.h>
 
+#include "retarget.h"
 #include "RTT/SEGGER_RTT.h"
 #include "__SEGGER_RTL_Int.h"
 //>>---------------------- Local declaration
@@ -19,18 +18,16 @@ struct __SEGGER_RTL_FILE_impl {
     int handle;
 };
 
-// static FILE __SEGGER_RTL_stdin_file = {0};  // stdin reads from RTT buffer #0
-// static FILE __SEGGER_RTL_stdin_file = {0};  // stdin reads from RTT buffer #0
-// static FILE __SEGGER_RTL_stdout_file = {0}; // stdout writes to RTT buffer #0
-// static FILE __SEGGER_RTL_stderr_file = {0}; // stdout writes to RTT buffer #0
+static FILE __SEGGER_RTL_stdin_file = {0};  // stdin reads from RTT buffer #0
+static FILE __SEGGER_RTL_stdout_file = {0}; // stdout writes to RTT buffer #0
+static FILE __SEGGER_RTL_stderr_file = {0}; // stdout writes to RTT buffer #0
 static int __SEGGER_RTL_stdin_ungot = EOF;
 //<<----------------------
 
 //>>---------------------- Public data
-// FILE *stdin = &__SEGGER_RTL_stdin_file;
-// FILE *stdin = &__SEGGER_RTL_stdin_file;
-// FILE *stdout = &__SEGGER_RTL_stdout_file;
-// FILE *stderr = &__SEGGER_RTL_stderr_file;
+FILE *stdin = &__SEGGER_RTL_stdin_file;
+FILE *stdout = &__SEGGER_RTL_stdout_file;
+FILE *stderr = &__SEGGER_RTL_stderr_file;
 //<<----------------------
 
 /**
@@ -93,7 +90,7 @@ static char __SEGGER_RTL_stdin_getc(void) {
         __SEGGER_RTL_stdin_ungot = EOF;
     } else {
         do {
-            r = SEGGER_RTT_Read(stdin->handle, &c, 1);
+            r = rt_get_char((void*)stdin->handle, &c, 1);
         } while (r == 0);
     }
     //
@@ -141,9 +138,21 @@ int __SEGGER_RTL_X_file_flush(__SEGGER_RTL_FILE *stream) {
     return 0;
 }
 
+/**
+ * @brief Write data to file
+ *
+ * stdout is directed to RTT buffer #0; stderr is directed to RTT buffer #1;
+ *
+ * @param stream Pointer to file to write to
+ * @param s Pointer to object to write to file
+ * @param len Number of characters to write to the file
+ * @return int
+ * >= 0 - Success
+ *  < 0 - Failure
+ */
 int __SEGGER_RTL_X_file_write(__SEGGER_RTL_FILE *stream, const char *s,
                               unsigned len) {
-    return SEGGER_RTT_Write(stream->handle, s, len);
+    return rt_put_char((void*)stream->handle, (char*)s, len);
 }
 
 int __SEGGER_RTL_X_file_unget(__SEGGER_RTL_FILE *stream, int c) {

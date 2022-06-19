@@ -146,16 +146,18 @@ static const textToCmd_t textToCmdList[] = {
 static const uint32_t CMD_LIST_SIZE =
     sizeof(textToCmdList) / sizeof(*textToCmdList);
 
-void CliReadTaskFunc(void *context) {
-    if (sys == nullptr) {
-        sys = reinterpret_cast<System *>(context);
-        i2c = sys->GetI2CBus();
-        io = sys->GetIo();
+void CliReadTaskFunc() {
+    scanf("%c", &buff[pos]);
+    if (buff[pos] == '\n') {
+        buff[pos] = '\0'; // TODO: need refactoring
+        if (!CliParse(buff.data(), textToCmdList, CMD_LIST_SIZE))
+            LOG_WARNING("Wrong cmd! Help: -h");
+        pos = 0;
+    } else {
+        pos++;
+        if (pos == buff.size())
+            pos = 0;
     }
-    scanf("%[^\n]", buff.data());
-    if (!CliParse(buff.data(), textToCmdList, CMD_LIST_SIZE))
-        LOG_WARNING("Wrong cmd! Help: -h");
-    getchar();  // Clear from buffer last char (flush stdin)
 }
 
 /**
@@ -197,8 +199,14 @@ void ShellHelpCmd(void) {
     }
 }
 
-void CliPutToBuf(const uint8_t data) {
-    if (pos >= INPUT_BUFFER_MAX_SIZE)
-        return;
-    buff[pos++] = data;
+/**
+ * @brief Init cli interface
+ *
+ * //TODO: refactor this
+ * @param sys
+ */
+void CliInit(void *context) {
+    sys = reinterpret_cast<System *>(context);
+    i2c = sys->GetI2CBus();
+    io = sys->GetIo();
 }
