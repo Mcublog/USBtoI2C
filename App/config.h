@@ -7,7 +7,7 @@
 
 #define ASCII_PROTO                 0
 #define BINARY_PROTO                1
-#define PROTOCOL                    ASCII_PROTO
+#define PROTOCOL                    BINARY_PROTO
 
 #define SYSTEM_LED_BLINK_PEROD      (500) // ms
 #define I2C_MAX_DATA_SIZE           (0xff >> 1)

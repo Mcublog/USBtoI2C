@@ -21,6 +21,7 @@
 #include <cstring>
 
 #include "config.h"
+#include "cobsr.h"
 #include "system.hpp"
 //>>---------------------- Log control
 #define LOG_MODULE_NAME cli
@@ -224,6 +225,10 @@ void CliReadTaskFunc() {
     scanf("%c", &buff[pos]);
     if (buff[pos] == kEND_CHAR) {
         buff[pos] = '\0';  // TODO: need refactoring
+        std::array<char, 64> decoded = {0};
+        cobsr_decode_result result = cobsr_decode(reinterpret_cast<void *>(buff.data()), 64, buff.data(), pos);
+        buff[result.out_len] = '\0';
+        LOG_INFO("result: %d : size: %d", result.status, result.out_len);
         if (!CliParse(buff.data(), textToCmdList, CMD_LIST_SIZE))
             LOG_WARNING("Wrong cmd! Help: -h");
         pos = 0;
