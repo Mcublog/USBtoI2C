@@ -14,14 +14,23 @@ DEBUG_SRC := $(SRC)/debug
 RING_INC := Ring-Buffer
 RING_SRC := Ring-Buffer
 
-all: $(BIN)/$(EXECUTABLE)
+COBS_INC := cobs-c
+COBS_SRC := cobs-c/cobsr.c
 
-run: clean all
+all:
+	make cobs
+	make $(BIN)/$(EXECUTABLE)
+
+run:
 	clear
 	./$(BIN)/$(EXECUTABLE)
 
-$(BIN)/$(EXECUTABLE): $(SRC)/*.cpp $(RING_SRC)/*.c $(DEBUG_SRC)/*.c
-	$(CXX) $(CXX_FLAGS) -I$(INCLUDE) -I$(DEBUG_INC) -I$(RING_INC) $^ -o $@ $(LIBRARIES)
+$(BIN)/$(EXECUTABLE): $(SRC)/*.cpp $(RING_SRC)/*.c $(DEBUG_SRC)/*.c $(BIN)/*.a
+	$(CXX) $(CXX_FLAGS) -I$(INCLUDE) -I$(DEBUG_INC) -I$(RING_INC) -I$(COBS_INC) $^ -o $@ $(LIBRARIES)
 
 clean:
+	-rm *.out
 	-rm $(BIN)/*
+
+cobs: $(COBS_SRC)
+	gcc -c -I$(COBS_INC) $^ -o $(BIN)/$@.a

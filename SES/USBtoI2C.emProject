@@ -66,6 +66,12 @@
       filter=""
       path="../Ring-Buffer"
       recurse="No" />
+    <folder
+      Name="cobs-c"
+      exclude=""
+      filter="cobsr.*"
+      path="../cobs-c"
+      recurse="No" />
   </project>
   <configuration
     Name="Debug"
@@ -144,6 +150,12 @@
       exclude=""
       filter=""
       path="../Ring-Buffer"
+      recurse="No" />
+    <folder
+      Name="cobs-c"
+      exclude=""
+      filter="cobsr.*"
+      path="../cobs-c"
       recurse="No" />
   </project>
 </solution>
