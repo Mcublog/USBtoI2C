@@ -24,8 +24,7 @@
  *
  * @param ctx
  */
-SystemError GreenPill::Initialize(void* ctx)
-{
+SystemError GreenPill::Initialize(void *ctx) {
     LOG_INFO("Green Pill init");
     io_.Initialize(nullptr);
     i2c_bus_.Initialize(nullptr);
@@ -37,9 +36,8 @@ SystemError GreenPill::Initialize(void* ctx)
  *
  * @return IOBus*
  */
-IOBus *GreenPill::GetI2CBus()
-{
-    return (IOBus*)&i2c_bus_;
+IOBus *GreenPill::GetI2CBus() {
+    return (IOBus *)&i2c_bus_;
 }
 
 /**
@@ -47,8 +45,6 @@ IOBus *GreenPill::GetI2CBus()
  *
  * @return SysGpio*
  */
-SysGpio *GreenPill::GetIo()
-{
-    return (SysGpio*)&io_;
+SysGpio *GreenPill::GetIo() {
+    return (SysGpio *)&io_;
 }
-

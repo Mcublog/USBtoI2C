@@ -1,9 +1,10 @@
 # Changelog
 
-## 0.1.1 (2022-06-14)
+## 0.2.0 (2022-06-19)
 
 #### New Features
 
+* Retarget stdio stream
 * Support i2c f407
 #### Fixes
 
@@ -17,3 +18,4 @@
 #### Others
 
 * :rocket: Desktop build
+* :art: Based to Google code style

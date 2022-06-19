@@ -9,6 +9,7 @@
  *
  */
 #include "core407io.hpp"
+
 #include "gpio.h"
 //>>---------------------- Log control
 #define LOG_MODULE_NAME c407io
@@ -25,8 +26,7 @@
  * @param ctx
  * @return IOError
  */
-IOError Core407IO::Initialize(void * ctx)
-{
+IOError Core407IO::Initialize(void* ctx) {
     LOG_INFO("Core407IO init");
     return IOError::kIO_OK;
 }
@@ -36,8 +36,7 @@ IOError Core407IO::Initialize(void * ctx)
  * @param state
  * @return IOError
  */
-IOError Core407IO::LedWrite(bool state)
-{
+IOError Core407IO::LedWrite(bool state) {
     GPIO_PinState out = state ? GPIO_PIN_SET : GPIO_PIN_RESET;
     HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, out);
     return IOError::kIO_OK;

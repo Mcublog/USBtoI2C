@@ -24,13 +24,10 @@
  *
  * @param ctx
  */
-SystemError System::Initialize(void* ctx)
-{
+SystemError System::Initialize(void *ctx) {
     UNUSED(ctx);
     LOG_INFO("System init");
-    i2c_bus_ = IOBus();
     i2c_bus_.Initialize(nullptr);
-    io_ = SysGpio();
     io_.Initialize(nullptr);
     return SystemError::kOK;
 }
@@ -40,8 +37,7 @@ SystemError System::Initialize(void* ctx)
  *
  * @param ms
  */
-void System::Delay(int ms)
-{
+void System::Delay(int ms) {
     LOG_INFO("waiting: %d ms", ms);
 }
 
@@ -50,8 +46,7 @@ void System::Delay(int ms)
  *
  * @return IOBus*
  */
-IOBus *System::GetI2CBus()
-{
+IOBus *System::GetI2CBus() {
     return &i2c_bus_;
 }
 
@@ -60,8 +55,7 @@ IOBus *System::GetI2CBus()
  *
  * @return IO*
  */
-SysGpio *System::GetIo()
-{
+SysGpio *System::GetIo() {
     return &io_;
 }
 
@@ -71,8 +65,7 @@ SysGpio *System::GetIo()
  * @param err
  * @return const char*
  */
-const char *System::ErrStringify(SystemError err)
-{
+const char *System::ErrStringify(SystemError err) {
     if (err == kTIMEOUT)
         return "TIMEOUT";
     else if (err == kBUSY)

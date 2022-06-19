@@ -1,8 +1,9 @@
+#include "application.h"
+
 #include <stdbool.h>
 
-#include "config.h"
-#include "application.h"
 #include "cli_handle.h"
+#include "config.h"
 #include "errors.h"
 // #include "usbd_cdc_if.h"
 #if defined(CORE407)
@@ -25,31 +26,14 @@ System sys = System();
 #include "log_libs.h"
 //<<----------------------
 bool host_com_port_open = false;
+ring_buffer_t input_ring;
 
-void LogLibsPrintCustom(char *buff, int n)
-{
-    UNUSED(buff);
-    UNUSED(n);
-    if (!host_com_port_open) {
-        return;
-    }
-    uint32_t attempts = 0;
-    while (attempts++ < CDC_TRANSMIT_ATTEMPTS)
-    {
-        // if (CDC_Transmit_FS((uint8_t *)buff, n) == USBD_OK)
-        // {
-        //     return;
-        // }
-        return;
-    }
-}
-
-void application(void)
-{
+void application(void) {
+    ring_buffer_init(&input_ring);
     sys.Initialize(nullptr);
     sys.GetIo()->LedWrite(true);
-    while (1)
-    {
-        CliReadTaskFunc((void*)&sys);
+    CliInit(&sys);
+    while (1) {
+        CliReadTaskFunc();
     }
 }

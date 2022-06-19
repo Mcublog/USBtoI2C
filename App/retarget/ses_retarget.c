@@ -10,27 +10,24 @@
  */
 #include <stdio.h>
 
+#include "retarget.h"
 #include "RTT/SEGGER_RTT.h"
 #include "__SEGGER_RTL_Int.h"
-#include "ses_retarget.h"
 //>>---------------------- Local declaration
-struct __SEGGER_RTL_FILE_impl
-{
+struct __SEGGER_RTL_FILE_impl {
     int handle;
 };
 
-// static FILE __SEGGER_RTL_stdin_file = {0};  // stdin reads from RTT buffer #0
-// static FILE __SEGGER_RTL_stdin_file = {0};  // stdin reads from RTT buffer #0
-// static FILE __SEGGER_RTL_stdout_file = {0}; // stdout writes to RTT buffer #0
-// static FILE __SEGGER_RTL_stderr_file = {0}; // stdout writes to RTT buffer #0
+static FILE __SEGGER_RTL_stdin_file = {0};  // stdin reads from RTT buffer #0
+static FILE __SEGGER_RTL_stdout_file = {0}; // stdout writes to RTT buffer #0
+static FILE __SEGGER_RTL_stderr_file = {0}; // stdout writes to RTT buffer #0
 static int __SEGGER_RTL_stdin_ungot = EOF;
 //<<----------------------
 
 //>>---------------------- Public data
-// FILE *stdin = &__SEGGER_RTL_stdin_file;
-// FILE *stdin = &__SEGGER_RTL_stdin_file;
-// FILE *stdout = &__SEGGER_RTL_stdout_file;
-// FILE *stderr = &__SEGGER_RTL_stderr_file;
+FILE *stdin = &__SEGGER_RTL_stdin_file;
+FILE *stdout = &__SEGGER_RTL_stdout_file;
+FILE *stderr = &__SEGGER_RTL_stderr_file;
 //<<----------------------
 
 /**
@@ -51,14 +48,10 @@ static int __SEGGER_RTL_stdin_ungot = EOF;
  * < 0 - Failure, stream is not a valid file
  * >= 0 - Success, stream is a valid file
  */
-int __SEGGER_RTL_X_file_stat(__SEGGER_RTL_FILE *stream)
-{
-    if (stream == stdin || stream == stdout || stream == stderr)
-    {
+int __SEGGER_RTL_X_file_stat(__SEGGER_RTL_FILE *stream) {
+    if (stream == stdin || stream == stdout || stream == stderr) {
         return 0;
-    }
-    else
-    {
+    } else {
         return EOF;
     }
 }
@@ -77,8 +70,7 @@ int __SEGGER_RTL_X_file_stat(__SEGGER_RTL_FILE *stream)
  * Nonzero number of characters to use for buffered I/O; for
  * unbuffered I/O, return 1.
  */
-int __SEGGER_RTL_X_file_bufsize(__SEGGER_RTL_FILE *stream)
-{
+int __SEGGER_RTL_X_file_bufsize(__SEGGER_RTL_FILE *stream) {
     return 64;
 }
 
@@ -89,21 +81,16 @@ int __SEGGER_RTL_X_file_bufsize(__SEGGER_RTL_FILE *stream)
  * @return char Character received.
  *
  */
-static char __SEGGER_RTL_stdin_getc(void)
-{
+static char __SEGGER_RTL_stdin_getc(void) {
     int r;
     char c;
     //
-    if (__SEGGER_RTL_stdin_ungot != EOF)
-    {
+    if (__SEGGER_RTL_stdin_ungot != EOF) {
         c = __SEGGER_RTL_stdin_ungot;
         __SEGGER_RTL_stdin_ungot = EOF;
-    }
-    else
-    {
-        do
-        {
-            r = SEGGER_RTT_Read(stdin->handle, &c, 1);
+    } else {
+        do {
+            r = rt_get_char((void*)stdin->handle, &c, 1);
         } while (r == 0);
     }
     //
@@ -123,21 +110,16 @@ static char __SEGGER_RTL_stdin_getc(void)
  * >= 0 - Success.
  * < 0 - Failure.
  */
-int __SEGGER_RTL_X_file_read(__SEGGER_RTL_FILE *stream, char *s, unsigned len)
-{
+int __SEGGER_RTL_X_file_read(__SEGGER_RTL_FILE *stream, char *s, unsigned len) {
     int c;
     //
-    if (stream == stdin)
-    {
+    if (stream == stdin) {
         c = 0;
-        while (len > 0)
-        {
+        while (len > 0) {
             *s++ = __SEGGER_RTL_stdin_getc();
             --len;
         }
-    }
-    else
-    {
+    } else {
         c = EOF;
     }
     //
@@ -152,32 +134,35 @@ int __SEGGER_RTL_X_file_read(__SEGGER_RTL_FILE *stream, char *s, unsigned len)
  * < 0 - Failure, file cannot be flushed or was not successfully flushed.
  * == 0 - Success, unwritten data is flushed.
  */
-int __SEGGER_RTL_X_file_flush(__SEGGER_RTL_FILE *stream)
-{
+int __SEGGER_RTL_X_file_flush(__SEGGER_RTL_FILE *stream) {
     return 0;
 }
 
+/**
+ * @brief Write data to file
+ *
+ * stdout is directed to RTT buffer #0; stderr is directed to RTT buffer #1;
+ *
+ * @param stream Pointer to file to write to
+ * @param s Pointer to object to write to file
+ * @param len Number of characters to write to the file
+ * @return int
+ * >= 0 - Success
+ *  < 0 - Failure
+ */
 int __SEGGER_RTL_X_file_write(__SEGGER_RTL_FILE *stream, const char *s,
-                              unsigned len)
-{
-    return SEGGER_RTT_Write(stream->handle, s, len);
+                              unsigned len) {
+    return rt_put_char((void*)stream->handle, (char*)s, len);
 }
 
-int __SEGGER_RTL_X_file_unget(__SEGGER_RTL_FILE *stream, int c)
-{
-    if (stream == stdin)
-    {
-        if (c != EOF && __SEGGER_RTL_stdin_ungot == EOF)
-        {
+int __SEGGER_RTL_X_file_unget(__SEGGER_RTL_FILE *stream, int c) {
+    if (stream == stdin) {
+        if (c != EOF && __SEGGER_RTL_stdin_ungot == EOF) {
             __SEGGER_RTL_stdin_ungot = c;
-        }
-        else
-        {
+        } else {
             c = EOF;
         }
-    }
-    else
-    {
+    } else {
         c = EOF;
     }
     //

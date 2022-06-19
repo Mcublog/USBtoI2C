@@ -21,6 +21,6 @@
     "doxdocgen.file.copyrightTag": [
         "@copyright Mcublog Copyright (c) {year}"
     ],
-    "C_Cpp.clang_format_fallbackStyle": "{BasedOnStyle: Microsoft, ColumnLimit: 80, IndentWidth: 4}",
+    "C_Cpp.clang_format_fallbackStyle": "{BasedOnStyle: Google, ColumnLimit: 90, IndentWidth: 4, ColumnLimit: 0}",
     "diffEditor.ignoreTrimWhitespace": false,
 }

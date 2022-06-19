@@ -26,8 +26,7 @@
  *
  * @param ctx
  */
-SystemError Core407::Initialize(void* ctx)
-{
+SystemError Core407::Initialize(void *ctx) {
     LOG_INFO("Core407 init");
     io_.Initialize(nullptr);
     i2c_bus_.Initialize(nullptr);
@@ -39,9 +38,8 @@ SystemError Core407::Initialize(void* ctx)
  *
  * @return IOBus*
  */
-IOBus *Core407::GetI2CBus()
-{
-    return (IOBus*)&i2c_bus_;
+IOBus *Core407::GetI2CBus() {
+    return (IOBus *)&i2c_bus_;
 }
 
 /**
@@ -49,7 +47,6 @@ IOBus *Core407::GetI2CBus()
  *
  * @return SysGpio*
  */
-SysGpio *Core407::GetIo()
-{
-    return (SysGpio*)&io_;
+SysGpio *Core407::GetIo() {
+    return (SysGpio *)&io_;
 }
