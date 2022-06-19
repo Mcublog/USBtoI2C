@@ -9,6 +9,8 @@
  *
  */
 
+#include "cli_handle.h"
+
 #include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
@@ -19,7 +21,6 @@
 #include <cstring>
 
 #include "config.h"
-#include "cli_handle.h"
 #include "system.hpp"
 //>>---------------------- Log control
 #define LOG_MODULE_NAME cli
@@ -30,6 +31,7 @@
 #endif
 #include "log_libs.h"
 //<<----------------------
+//>>---------------------- Local Declaration
 #define INPUT_BUFFER_MAX_SIZE (32)
 static std::array<char, INPUT_BUFFER_MAX_SIZE> buff;
 
@@ -37,42 +39,27 @@ static System *sys = nullptr;
 static IOBus *i2c = nullptr;
 static SysGpio *io = nullptr;
 static uint8_t pos = 0;
+
 static void ShellHelpCmd(void);
-
 template <typename T, size_t N>
-static void Print_hex_array(std::array<T, N> const &data) {
-    for (size_t i = 0; i < data.size(); i++) {
-        if (data[i] == 0)
-            break;
-        LOG_RAW_INFO("%#x ", data[i]);
-    }
-    LOG_RAW_INFO("\r\n");
-}
+static void PrintHexArray(std::array<T, N> const &data);
+static bool WriteI2C(uint8_t adr, uint8_t regadr, uint8_t regsize, uint8_t *data,
+                     size_t size);
+static bool ReadI2C(uint8_t adr, uint8_t regadr, uint8_t regsize,
+                    uint8_t *data, size_t size);
 
-static void Print_hex_array(uint8_t *data, size_t size) {
-    for (size_t i = 0; i < size; ++i) {
-        LOG_RAW_INFO("%#x ", data[i]);
-    }
-    LOG_RAW_INFO("\r\n");
-}
+#if PROTOCOL == ASCII_PROTO
+static const char kEND_CHAR = '\n';
+#elif PROTOCOL == BINARY_PROTO
+static const char kEND_CHAR = '\0';
+#endif
+//<<----------------------
 
-bool _i2c_write(uint8_t adr, uint8_t regadr, uint8_t regsize, uint8_t *data,
-                size_t size) {
-    IOError err = i2c->Write(adr, regadr, regsize, data, size);
-    LOG_ERROR("%s", IOBus::ErrStringify(err));
-    return false;
-}
-
-static bool _i2c_read(uint8_t adr, uint8_t regadr, uint8_t regsize,
-                      uint8_t *data, size_t size) {
-    IOError err = i2c->Read(adr, regadr, regsize, data, size);
-    if (err == IOError::kIO_OK)
-        Print_hex_array(data, size);
-    else
-        LOG_ERROR("%s", IOBus::ErrStringify(err));
-    return false;
-}
-
+//>>---------------------- Local Definition
+/**
+ * @brief
+ *
+ */
 static const textToCmd_t textToCmdList[] = {
     {"-h", "Print this help",
      [](const char *text) -> bool {
@@ -99,7 +86,7 @@ static const textToCmd_t textToCmdList[] = {
                     &MemAddSize, &Size) < 4) {
              return false;
          }
-         _i2c_read(DevAddress, MemAddress, MemAddSize, data, Size);
+         ReadI2C(DevAddress, MemAddress, MemAddSize, data, Size);
          return true;
      }},
     {"-w",
@@ -116,7 +103,7 @@ static const textToCmd_t textToCmdList[] = {
          if (sscanf_res < 5) {
              return false;
          }
-         _i2c_write(DevAddress, MemAddress, MemAddSize, data, Size);
+         WriteI2C(DevAddress, MemAddress, MemAddSize, data, Size);
          return true;
      }},
     {"-s", "[Trials] [Timeout] scan i2c bus",
@@ -136,20 +123,107 @@ static const textToCmd_t textToCmdList[] = {
              }
          }
          if (data.front())
-             Print_hex_array(data);
+             PrintHexArray(data);
          else
              LOG_RAW_INFO("not found!\r\n");
          return true;
      }},
 };
 
+// TODO: refactor this
 static const uint32_t CMD_LIST_SIZE =
     sizeof(textToCmdList) / sizeof(*textToCmdList);
 
+/**
+ * @brief Print hex array
+ *
+ * @param data
+ */
+template <typename T, size_t N>
+void PrintHexArray(std::array<T, N> const &data) {
+    for (size_t i = 0; i < data.size(); i++) {
+        if (data[i] == 0)
+            break;
+        LOG_RAW_INFO("%#x ", data[i]);
+    }
+    LOG_RAW_INFO("\r\n");
+}
+
+/**
+ * @brief Overload print array
+ *
+ * @param data
+ * @param size
+ */
+void PrintHexArray(uint8_t *data, size_t size) {
+    for (size_t i = 0; i < size; ++i) {
+        LOG_RAW_INFO("%#x ", data[i]);
+    }
+    LOG_RAW_INFO("\r\n");
+}
+
+/**
+ * @brief Write to I2C bus
+ *
+ * @param adr
+ * @param regadr
+ * @param regsize
+ * @param data
+ * @param size
+ * @return true
+ * @return false
+ */
+bool WriteI2C(uint8_t adr, uint8_t regadr, uint8_t regsize, uint8_t *data,
+                     size_t size) {
+    IOError err = i2c->Write(adr, regadr, regsize, data, size);
+    LOG_ERROR("%s", IOBus::ErrStringify(err));
+    return false;
+}
+
+/**
+ * @brief Read from I2C bus
+ *
+ * @param adr
+ * @param regadr
+ * @param regsize
+ * @param data
+ * @param size
+ * @return true
+ * @return false
+ */
+bool ReadI2C(uint8_t adr, uint8_t regadr, uint8_t regsize,
+                    uint8_t *data, size_t size) {
+    IOError err = i2c->Read(adr, regadr, regsize, data, size);
+    if (err == IOError::kIO_OK)
+        PrintHexArray(data, size);
+    else
+        LOG_ERROR("%s", IOBus::ErrStringify(err));
+    return false;
+}
+
+/**
+ * @brief
+ *
+ */
+void ShellHelpCmd(void) {
+    LOG_INFO("Shell commands: %d:  %d", sizeof(textToCmdList),
+             sizeof(*textToCmdList));
+
+    for (uint32_t i = 0; i < CMD_LIST_SIZE; ++i) {
+        LOG_RAW_INFO("%s %s\n\r", textToCmdList[i].cmdTextP,
+                     textToCmdList[i].cmdDecrP);
+    }
+}
+//<<----------------------
+
+/**
+ * @brief
+ *
+ */
 void CliReadTaskFunc() {
     scanf("%c", &buff[pos]);
-    if (buff[pos] == '\n') {
-        buff[pos] = '\0'; // TODO: need refactoring
+    if (buff[pos] == kEND_CHAR) {
+        buff[pos] = '\0';  // TODO: need refactoring
         if (!CliParse(buff.data(), textToCmdList, CMD_LIST_SIZE))
             LOG_WARNING("Wrong cmd! Help: -h");
         pos = 0;
@@ -183,20 +257,6 @@ bool CliParse(const char *msgP, const textToCmd_t *table, size_t tableLen) {
     }
     /*unknown command*/
     return false;
-}
-
-/**
- * @brief
- *
- */
-void ShellHelpCmd(void) {
-    LOG_INFO("Shell commands: %d:  %d", sizeof(textToCmdList),
-             sizeof(*textToCmdList));
-
-    for (uint32_t i = 0; i < CMD_LIST_SIZE; ++i) {
-        LOG_RAW_INFO("%s %s\n\r", textToCmdList[i].cmdTextP,
-                     textToCmdList[i].cmdDecrP);
-    }
 }
 
 /**
