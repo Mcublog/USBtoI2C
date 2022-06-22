@@ -21,9 +21,8 @@ all:
 	make cobs
 	make $(BIN)/$(EXECUTABLE)
 
-run:
-	clear
-	./$(BIN)/$(EXECUTABLE)
+cobs: $(COBS_SRC)
+	gcc -c -I$(COBS_INC) $^ -o $(BIN)/$@.a
 
 $(BIN)/$(EXECUTABLE): $(SRC)/*.cpp $(RING_SRC)/*.c $(DEBUG_SRC)/*.c $(BIN)/*.a
 	$(CXX) $(CXX_FLAGS) -I$(INCLUDE) -I$(DEBUG_INC) -I$(RING_INC) -I$(COBS_INC) $^ -o $@ $(LIBRARIES)
@@ -32,5 +31,9 @@ clean:
 	-rm *.out
 	-rm $(BIN)/*
 
-cobs: $(COBS_SRC)
-	gcc -c -I$(COBS_INC) $^ -o $(BIN)/$@.a
+run: clean
+	clear
+	make cobs
+	make $(BIN)/$(EXECUTABLE)
+	$(BIN)/$(EXECUTABLE)
+
