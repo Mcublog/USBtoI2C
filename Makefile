@@ -39,6 +39,11 @@ rebuild: clean
 run: rebuild
 	$(BIN)/$(EXECUTABLE)
 
-tty: rebuild
+run_on_tty: rebuild
 	$(BIN)/$(EXECUTABLE) /dev/ttyS10
 
+nullmodem:
+	-chmod 777 /dev/ttyS11 /dev/ttyS10
+
+create_tty:
+	-socat PTY,link=/dev/ttyS10,raw,echo=0 PTY,link=/dev/ttyS11,raw,echo=0 &
