@@ -50,19 +50,6 @@ static const char kEND_CHAR = '\0';
  * @brief
  *
  */
-void ShellHelpCmd(void) {
-    LOG_INFO("Shell commands");
-
-    for (uint32_t i = 0; i < cmd_list_size; ++i) {
-        LOG_RAW_INFO("%s %s\n\r", textToCmdList[i].cmdTextP,
-                     textToCmdList[i].cmdDecrP);
-    }
-}
-
-/**
- * @brief
- *
- */
 void CliReadTaskFunc() {
     scanf("%c", &buff[pos]);
     if (buff[pos] == kEND_CHAR) {

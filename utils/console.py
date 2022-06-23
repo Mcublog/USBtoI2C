@@ -7,7 +7,7 @@ from cobs import cobsr
 
 
 def main():
-    data = str.encode("-led on")
+    data = str.encode("-h")
     with serial.Serial(port="/dev/ttyS11") as s:
         data = cobsr.encode(data)
         print(f"send: {data}")

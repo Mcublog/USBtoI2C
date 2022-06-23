@@ -38,6 +38,7 @@ static bool WriteI2C(uint8_t adr, uint8_t regadr, uint8_t regsize, uint8_t *data
                      size_t size);
 static bool ReadI2C(uint8_t adr, uint8_t regadr, uint8_t regsize,
                     uint8_t *data, size_t size);
+static void ShellHelpCmd(void);
 
 static const textToCmd_t textToCmdList[] = {
     {"-h", "Print this help",
@@ -107,9 +108,28 @@ static const textToCmd_t textToCmdList[] = {
              LOG_RAW_INFO("not found!\r\n");
          return true;
      }},
+    {"-b", "switch to binary mode",
+     [](const char *text) -> bool {
+         (void)text;
+         LOG_RAW_INFO("binary mode is ON\r\n");
+         return true;
+     }},
 };
-//<<----------------------
 
+static const uint32_t kCMD_LIST_SIZE =  sizeof(textToCmdList) / sizeof(*textToCmdList);
+//<<----------------------
+/**
+ * @brief
+ *
+ */
+void ShellHelpCmd(void) {
+    LOG_INFO("Shell commands");
+
+    for (uint32_t i = 0; i < kCMD_LIST_SIZE; ++i) {
+        LOG_RAW_INFO("%s %s\n\r", textToCmdList[i].cmdTextP,
+                     textToCmdList[i].cmdDecrP);
+    }
+}
 /**
  * @brief Print hex array
  *
@@ -185,7 +205,7 @@ void application(void) {
     ring_buffer_init(&g_input_ring);
     sys.Initialize(nullptr);
     sys.GetIo()->LedWrite(true);
-    CliInit(textToCmdList, sizeof(textToCmdList) / sizeof(*textToCmdList));
+    CliInit(textToCmdList, kCMD_LIST_SIZE);
     while (1) {
         CliReadTaskFunc();
     }
