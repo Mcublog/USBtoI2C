@@ -16,9 +16,10 @@ typedef struct
     bool (*func)(const char*);
 } textToCmd_t;
 
-void CliInit(void *context);
+void CliInit(textToCmd_t const *command_list, uint32_t list_size);
 void CliReadTaskFunc(void);
 bool CliParse(const char *msg, const textToCmd_t *table, size_t tableLen);
+void ShellHelpCmd(void);
 
 #ifdef __cplusplus
 }

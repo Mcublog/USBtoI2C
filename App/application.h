@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 
-extern ring_buffer_t input_ring;
+extern ring_buffer_t g_input_ring;
 
 void application(void);
 

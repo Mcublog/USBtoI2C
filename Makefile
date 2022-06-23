@@ -31,9 +31,14 @@ clean:
 	-rm *.out
 	-rm $(BIN)/*
 
-run: clean
+rebuild: clean
 	clear
 	make cobs
 	make $(BIN)/$(EXECUTABLE)
+
+run: rebuild
 	$(BIN)/$(EXECUTABLE)
+
+tty: rebuild
+	$(BIN)/$(EXECUTABLE) /dev/ttyS10
 
