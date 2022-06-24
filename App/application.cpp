@@ -38,13 +38,12 @@ static bool WriteI2C(uint8_t adr, uint8_t regadr, uint8_t regsize, uint8_t *data
                      size_t size);
 static bool ReadI2C(uint8_t adr, uint8_t regadr, uint8_t regsize,
                     uint8_t *data, size_t size);
-static void ShellHelpCmd(void);
 
 static const textToCmd_t textToCmdList[] = {
     {"-h", "Print this help",
      [](const char *text) -> bool {
          UNUSED(text);
-         ShellHelpCmd();
+         CliHelpCmd();
          return true;
      }},
     {"-led", "[on/off] led ctrl",
@@ -111,6 +110,7 @@ static const textToCmd_t textToCmdList[] = {
     {"-b", "switch to binary mode",
      [](const char *text) -> bool {
          (void)text;
+         CliSetParsingMode(true);
          LOG_RAW_INFO("binary mode is ON\r\n");
          return true;
      }},
@@ -118,18 +118,6 @@ static const textToCmd_t textToCmdList[] = {
 
 static const uint32_t kCMD_LIST_SIZE =  sizeof(textToCmdList) / sizeof(*textToCmdList);
 //<<----------------------
-/**
- * @brief
- *
- */
-void ShellHelpCmd(void) {
-    LOG_INFO("Shell commands");
-
-    for (uint32_t i = 0; i < kCMD_LIST_SIZE; ++i) {
-        LOG_RAW_INFO("%s %s\n\r", textToCmdList[i].cmdTextP,
-                     textToCmdList[i].cmdDecrP);
-    }
-}
 /**
  * @brief Print hex array
  *

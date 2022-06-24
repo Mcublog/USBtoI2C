@@ -35,16 +35,16 @@
 //>>---------------------- Local Declaration
 #define INPUT_BUFFER_MAX_SIZE (32)
 static std::array<char, INPUT_BUFFER_MAX_SIZE> buff;
+std::array<char, INPUT_BUFFER_MAX_SIZE> decoded = {0};
 
 static const textToCmd_t *textToCmdList = nullptr;
 static uint32_t cmd_list_size = 0;
 static uint8_t pos = 0;
 
-#if PROTOCOL == ASCII_PROTO
-static const char kEND_CHAR = '\n';
-#elif PROTOCOL == BINARY_PROTO
-static const char kEND_CHAR = '\0';
-#endif
+static char end_char = '\n';
+
+static const char kASCII_END_CHAR = '\n';
+static const char kBINARY_END_CHAR = '\0';
 //<<----------------------
 /**
  * @brief
@@ -52,13 +52,23 @@ static const char kEND_CHAR = '\0';
  */
 void CliReadTaskFunc() {
     scanf("%c", &buff[pos]);
-    if (buff[pos] == kEND_CHAR) {
-        buff[pos] = '\0';  // TODO: need refactoring
-        std::array<char, 64> decoded = {0};
-        cobsr_decode_result result = cobsr_decode(reinterpret_cast<void *>(decoded.data()), 64, buff.data(), pos);
-        buff[result.out_len] = '\0';
-        LOG_INFO("result: %d : size: %d", result.status, result.out_len);
-        if (!CliParse(decoded.data(), textToCmdList, cmd_list_size))
+    if (buff[pos] == end_char) {
+        // TODO: need refactoring code below
+        bool binmode = end_char == kBINARY_END_CHAR;
+        buff[pos] = '\0';
+        if (binmode)
+        {
+            cobsr_decode_result result = cobsr_decode(reinterpret_cast<void *>(decoded.data()), 64, buff.data(), pos);
+            buff[result.out_len] = '\0';
+            LOG_INFO("result: %d : size: %d", result.status, result.out_len);
+            if (result.status != COBSR_DECODE_OK)
+            {
+                pos = 0;
+                return;
+            }
+        }
+        char *cmd = binmode ? decoded.data() : buff.data();
+        if (!CliParse(cmd, textToCmdList, cmd_list_size))
             LOG_WARNING("Wrong cmd! Help: -h");
         pos = 0;
     } else {
@@ -102,4 +112,26 @@ bool CliParse(const char *msgP, const textToCmd_t *table, size_t tableLen) {
 void CliInit(const textToCmd_t *command_list, uint32_t list_size) {
     textToCmdList = command_list;
     cmd_list_size = list_size;
+}
+
+/**
+ * @brief Set parsing mode (Binary mode On/Off)
+ *
+ * @param binary_mode
+ */
+void CliSetParsingMode(const bool binary_mode) {
+    end_char = binary_mode ? kBINARY_END_CHAR : kASCII_END_CHAR;
+}
+
+/**
+ * @brief
+ *
+ */
+void CliHelpCmd() {
+    LOG_INFO("Shell commands");
+
+    for (uint32_t i = 0; i < cmd_list_size; ++i) {
+        LOG_RAW_INFO("%s %s\n\r", textToCmdList[i].cmdTextP,
+                     textToCmdList[i].cmdDecrP);
+    }
 }
