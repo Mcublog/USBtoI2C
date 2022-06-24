@@ -41,10 +41,10 @@ static const textToCmd_t *textToCmdList = nullptr;
 static uint32_t cmd_list_size = 0;
 static uint8_t pos = 0;
 
-static char end_char = '\n';
-
 static const char kASCII_END_CHAR = '\n';
 static const char kBINARY_END_CHAR = '\0';
+
+static char end_char = kASCII_END_CHAR;
 //<<----------------------
 /**
  * @brief
@@ -58,6 +58,7 @@ void CliReadTaskFunc() {
         buff[pos] = '\0';
         if (binmode)
         {
+            decoded.fill(0);
             cobsr_decode_result result = cobsr_decode(reinterpret_cast<void *>(decoded.data()), 64, buff.data(), pos);
             buff[result.out_len] = '\0';
             LOG_INFO("result: %d : size: %d", result.status, result.out_len);
