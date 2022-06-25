@@ -7,6 +7,7 @@
 
 #include "cli_handle.h"
 #include "config.h"
+#include "version.h"
 #include "errors.h"
 // #include "usbd_cdc_if.h"
 #if defined(CORE407)
@@ -114,6 +115,12 @@ static const textToCmd_t textToCmdList[] = {
          LOG_RAW_INFO("binary mode is ON\r\n");
          return true;
      }},
+    {"-v", "get version",
+     [](const char *text) -> bool {
+         (void)text;
+         LOG_RAW_INFO("%s\r\n", FW_VERSION);
+         return true;
+     }},
 };
 
 static const uint32_t kCMD_LIST_SIZE =  sizeof(textToCmdList) / sizeof(*textToCmdList);
@@ -190,6 +197,7 @@ bool ReadI2C(uint8_t adr, uint8_t regadr, uint8_t regsize,
  *
  */
 void application(void) {
+    LOG_INFO("Version: %s", FW_VERSION);
     ring_buffer_init(&g_input_ring);
     sys.Initialize(nullptr);
     sys.GetIo()->LedWrite(true);
