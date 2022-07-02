@@ -25,7 +25,7 @@
 IOError IOBus::Initialize(void *ctx) {
     UNUSED(ctx);
     LOG_INFO("I2C bus init");
-    return IOError::kIO_OK;
+    return IOError::IO_OK;
 }
 
 /**
@@ -36,9 +36,9 @@ IOError IOBus::Initialize(void *ctx) {
  */
 IOError IOBus::IsReady(uint8_t adr) {
     if (adr != kVirtualI2CDeviceAddress)
-        return IOError::kIO_ERR;
+        return IOError::IO_ERR;
     LOG_INFO("Find I2C virtual: %#x", adr);
-    return IOError::kIO_OK;
+    return IOError::IO_OK;
 }
 
 /**
@@ -58,7 +58,7 @@ IOError IOBus::Write(uint8_t adr, uint8_t reg, uint8_t regsize,
     for (int32_t i = 0; i < len; ++i)
         LOG_RAW_INFO("%#x ", data[i]);
     LOG_RAW_INFO("\n");
-    return IOError::kIO_OK;
+    return IOError::IO_OK;
 }
 
 /**
@@ -81,7 +81,7 @@ IOError IOBus::Read(uint8_t adr, uint8_t reg, uint8_t regsize,
         LOG_RAW_INFO("%#x ", data[i]);
     }
     LOG_RAW_INFO("\n");
-    return IOError::kIO_OK;
+    return IOError::IO_OK;
 }
 
 /**
@@ -91,11 +91,11 @@ IOError IOBus::Read(uint8_t adr, uint8_t reg, uint8_t regsize,
  * @return const char*
  */
 const char *IOBus::ErrStringify(IOError err) {
-    if (err == kIO_TIMEOUT)
+    if (err == IO_TIMEOUT)
         return "IO_I2C_TIMEOUT";
-    else if (err == kIO_BUSY)
+    else if (err == IO_BUSY)
         return "IO_I2C_BUSY";
-    else if (err == kIO_ERR)
+    else if (err == IO_ERR)
         return "IO_I2C_ERR";
     return "IO_I2C_OK";
 }

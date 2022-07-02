@@ -95,7 +95,7 @@ static const textToCmd_t textToCmdList[] = {
              return false;
          for (uint8_t addr = 0, i = 0; addr <= I2C_MAX_DATA_SIZE; ++addr) {
              for (uint32_t j = 0; j < Trials; ++j) {
-                 if (sys.GetI2CBus()->IsReady(addr) == kIO_OK) {
+                 if (sys.GetI2CBus()->IsReady(addr) == IO_OK) {
                      data[i++] = addr;
                      break;
                  }
@@ -123,7 +123,7 @@ static const textToCmd_t textToCmdList[] = {
      }},
 };
 
-static const uint32_t kCMD_LIST_SIZE =  sizeof(textToCmdList) / sizeof(*textToCmdList);
+static const uint32_t CMD_LIST_SIZE =  sizeof(textToCmdList) / sizeof(*textToCmdList);
 //<<----------------------
 /**
  * @brief Print hex array
@@ -185,7 +185,7 @@ bool WriteI2C(uint8_t adr, uint8_t regadr, uint8_t regsize, uint8_t *data,
 bool ReadI2C(uint8_t adr, uint8_t regadr, uint8_t regsize,
              uint8_t *data, size_t size) {
     IOError err = sys.GetI2CBus()->Read(adr, regadr, regsize, data, size);
-    if (err == IOError::kIO_OK)
+    if (err == IOError::IO_OK)
         PrintHexArray(data, size);
     else
         LOG_ERROR("%s", IOBus::ErrStringify(err));
@@ -201,7 +201,7 @@ void application(void) {
     ring_buffer_init(&g_input_ring);
     sys.Initialize(nullptr);
     sys.GetIo()->LedWrite(true);
-    CliInit(textToCmdList, kCMD_LIST_SIZE);
+    CliInit(textToCmdList, CMD_LIST_SIZE);
     while (1) {
         CliReadTaskFunc();
     }

@@ -28,7 +28,7 @@ SystemError GreenPill::Initialize(void *ctx) {
     LOG_INFO("Green Pill init");
     io_.Initialize(nullptr);
     i2c_bus_.Initialize(nullptr);
-    return SystemError::kOK;
+    return SystemError::OK;
 }
 
 /**

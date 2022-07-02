@@ -28,7 +28,7 @@
  */
 IOError Core407IO::Initialize(void* ctx) {
     LOG_INFO("Core407IO init");
-    return IOError::kIO_OK;
+    return IOError::IO_OK;
 }
 /**
  * @brief Write to LED output
@@ -39,5 +39,5 @@ IOError Core407IO::Initialize(void* ctx) {
 IOError Core407IO::LedWrite(bool state) {
     GPIO_PinState out = state ? GPIO_PIN_SET : GPIO_PIN_RESET;
     HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, out);
-    return IOError::kIO_OK;
+    return IOError::IO_OK;
 }
