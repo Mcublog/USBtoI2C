@@ -28,12 +28,12 @@
  */
 IOError GpBus::to_iobus_error(int err) {
     if (err == HAL_ERROR)
-        return kIO_ERR;
+        return IO_ERR;
     else if (err == HAL_BUSY)
-        return kIO_BUSY;
+        return IO_BUSY;
     else if (err == HAL_TIMEOUT)
-        return kIO_TIMEOUT;
-    return kIO_OK;
+        return IO_TIMEOUT;
+    return IO_OK;
 }
 
 /**
@@ -44,7 +44,7 @@ IOError GpBus::to_iobus_error(int err) {
  */
 IOError GpBus::Initialize(void *ctx) {
     i2c_handle_ = &hi2c1;
-    return kIO_OK;
+    return IO_OK;
 }
 
 /**

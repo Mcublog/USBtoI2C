@@ -9,6 +9,8 @@
  *
  */
 
+#include "cli_handle.h"
+
 #include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
@@ -19,7 +21,7 @@
 #include <cstring>
 
 #include "config.h"
-#include "cli_handle.h"
+#include "cobsr.h"
 #include "system.hpp"
 //>>---------------------- Log control
 #define LOG_MODULE_NAME cli
@@ -30,127 +32,44 @@
 #endif
 #include "log_libs.h"
 //<<----------------------
+//>>---------------------- Local Declaration
 #define INPUT_BUFFER_MAX_SIZE (32)
 static std::array<char, INPUT_BUFFER_MAX_SIZE> buff;
+std::array<char, INPUT_BUFFER_MAX_SIZE> decoded = {0};
 
-static System *sys = nullptr;
-static IOBus *i2c = nullptr;
-static SysGpio *io = nullptr;
+static const textToCmd_t *textToCmdList = nullptr;
+static uint32_t cmd_list_size = 0;
 static uint8_t pos = 0;
-static void ShellHelpCmd(void);
 
-template <typename T, size_t N>
-static void Print_hex_array(std::array<T, N> const &data) {
-    for (size_t i = 0; i < data.size(); i++) {
-        if (data[i] == 0)
-            break;
-        LOG_RAW_INFO("%#x ", data[i]);
-    }
-    LOG_RAW_INFO("\r\n");
-}
+static const char kASCII_END_CHAR = '\n';
+static const char kBINARY_END_CHAR = '\0';
 
-static void Print_hex_array(uint8_t *data, size_t size) {
-    for (size_t i = 0; i < size; ++i) {
-        LOG_RAW_INFO("%#x ", data[i]);
-    }
-    LOG_RAW_INFO("\r\n");
-}
-
-bool _i2c_write(uint8_t adr, uint8_t regadr, uint8_t regsize, uint8_t *data,
-                size_t size) {
-    IOError err = i2c->Write(adr, regadr, regsize, data, size);
-    LOG_ERROR("%s", IOBus::ErrStringify(err));
-    return false;
-}
-
-static bool _i2c_read(uint8_t adr, uint8_t regadr, uint8_t regsize,
-                      uint8_t *data, size_t size) {
-    IOError err = i2c->Read(adr, regadr, regsize, data, size);
-    if (err == IOError::kIO_OK)
-        Print_hex_array(data, size);
-    else
-        LOG_ERROR("%s", IOBus::ErrStringify(err));
-    return false;
-}
-
-static const textToCmd_t textToCmdList[] = {
-    {"-h", "Print this help",
-     [](const char *text) -> bool {
-         UNUSED(text);
-         ShellHelpCmd();
-         return true;
-     }},
-    {"-led", "[on/off] led ctrl",
-     [](const char *text) -> bool {
-         if (!(strstr(text, "on") || strstr(text, "off")))
-             return false;
-         bool state = strstr(text, "on") ? true : false;
-         io->LedWrite(state);
-         return true;
-     }},
-    {"-r", "[DevAddress] [MemAddress] [MemAddSize] [Size] read i2c registers",
-     [](const char *text) -> bool {
-         uint16_t DevAddress;
-         uint16_t MemAddress;
-         uint16_t MemAddSize;
-         uint8_t data[I2C_MAX_DATA_SIZE];
-         uint16_t Size;
-         if (sscanf(text, "%hx %hx %hd %hd", &DevAddress, &MemAddress,
-                    &MemAddSize, &Size) < 4) {
-             return false;
-         }
-         _i2c_read(DevAddress, MemAddress, MemAddSize, data, Size);
-         return true;
-     }},
-    {"-w",
-     "[DevAddress] [MemAddress] [MemAddSize] [DataSize] [Data] write one i2c "
-     "register",
-     [](const char *text) -> bool {
-         uint16_t DevAddress;
-         uint16_t MemAddress;
-         uint16_t MemAddSize;
-         uint8_t data[I2C_MAX_DATA_SIZE] = {0};
-         uint16_t Size;
-         int sscanf_res = sscanf(text, "%hx %hx %hd %hd %hd", &DevAddress,
-                                 &MemAddress, &MemAddSize, &Size, data);
-         if (sscanf_res < 5) {
-             return false;
-         }
-         _i2c_write(DevAddress, MemAddress, MemAddSize, data, Size);
-         return true;
-     }},
-    {"-s", "[Trials] [Timeout] scan i2c bus",
-     [](const char *text) -> bool {
-         uint32_t Trials;
-         uint32_t Timeout;
-         std::array<uint8_t, I2C_MAX_DATA_SIZE> data = {0};
-         if (sscanf(text, "%d %d", &Trials, &Timeout) < 2)
-             return false;
-         for (uint8_t addr = 0, i = 0; addr <= I2C_MAX_DATA_SIZE; ++addr) {
-             for (uint32_t j = 0; j < Trials; ++j) {
-                 if (i2c->IsReady(addr) == kIO_OK) {
-                     data[i++] = addr;
-                     break;
-                 }
-                 //  sys->Delay(5);
-             }
-         }
-         if (data.front())
-             Print_hex_array(data);
-         else
-             LOG_RAW_INFO("not found!\r\n");
-         return true;
-     }},
-};
-
-static const uint32_t CMD_LIST_SIZE =
-    sizeof(textToCmdList) / sizeof(*textToCmdList);
-
+static char end_char = kASCII_END_CHAR;
+//<<----------------------
+/**
+ * @brief
+ *
+ */
 void CliReadTaskFunc() {
     scanf("%c", &buff[pos]);
-    if (buff[pos] == '\n') {
-        buff[pos] = '\0'; // TODO: need refactoring
-        if (!CliParse(buff.data(), textToCmdList, CMD_LIST_SIZE))
+    if (buff[pos] == end_char) {
+        // TODO: need refactoring code below
+        bool binmode = end_char == kBINARY_END_CHAR;
+        buff[pos] = '\0';
+        if (binmode)
+        {
+            decoded.fill(0);
+            cobsr_decode_result result = cobsr_decode(reinterpret_cast<void *>(decoded.data()), 64, buff.data(), pos);
+            buff[result.out_len] = '\0';
+            LOG_INFO("result: %d : size: %d", result.status, result.out_len);
+            if (result.status != COBSR_DECODE_OK)
+            {
+                pos = 0;
+                return;
+            }
+        }
+        char *cmd = binmode ? decoded.data() : buff.data();
+        if (!CliParse(cmd, textToCmdList, cmd_list_size))
             LOG_WARNING("Wrong cmd! Help: -h");
         pos = 0;
     } else {
@@ -186,27 +105,34 @@ bool CliParse(const char *msgP, const textToCmd_t *table, size_t tableLen) {
 }
 
 /**
- * @brief
+ * @brief Init cli interface
  *
+ * @param command_list
+ * @param list_size
  */
-void ShellHelpCmd(void) {
-    LOG_INFO("Shell commands: %d:  %d", sizeof(textToCmdList),
-             sizeof(*textToCmdList));
-
-    for (uint32_t i = 0; i < CMD_LIST_SIZE; ++i) {
-        LOG_RAW_INFO("%s %s\n\r", textToCmdList[i].cmdTextP,
-                     textToCmdList[i].cmdDecrP);
-    }
+void CliInit(const textToCmd_t *command_list, uint32_t list_size) {
+    textToCmdList = command_list;
+    cmd_list_size = list_size;
 }
 
 /**
- * @brief Init cli interface
+ * @brief Set parsing mode (Binary mode On/Off)
  *
- * //TODO: refactor this
- * @param sys
+ * @param binary_mode
  */
-void CliInit(void *context) {
-    sys = reinterpret_cast<System *>(context);
-    i2c = sys->GetI2CBus();
-    io = sys->GetIo();
+void CliSetParsingMode(const bool binary_mode) {
+    end_char = binary_mode ? kBINARY_END_CHAR : kASCII_END_CHAR;
+}
+
+/**
+ * @brief
+ *
+ */
+void CliHelpCmd() {
+    LOG_INFO("Shell commands");
+
+    for (uint32_t i = 0; i < cmd_list_size; ++i) {
+        LOG_RAW_INFO("%s %s\n\r", textToCmdList[i].cmdTextP,
+                     textToCmdList[i].cmdDecrP);
+    }
 }

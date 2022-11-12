@@ -28,7 +28,7 @@
  */
 IOError GpIO::Initialize(void* ctx) {
     LOG_INFO("Green Pill init");
-    return IOError::kIO_OK;
+    return IOError::IO_OK;
 }
 /**
  * @brief Write to LED output
@@ -39,5 +39,5 @@ IOError GpIO::Initialize(void* ctx) {
 IOError GpIO::LedWrite(bool state) {
     GPIO_PinState out = state ? GPIO_PIN_RESET : GPIO_PIN_SET;
     HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, out);
-    return IOError::kIO_OK;
+    return IOError::IO_OK;
 }
