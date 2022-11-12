@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.2.0 (2022-06-19)
+## 0.3.0 (2022-11-12)
 
 #### New Features
 
@@ -17,5 +17,7 @@
 * :memo: Added some UM and schematics
 #### Others
 
+* Build cobs as static lib
 * :rocket: Desktop build
+* :art: Move CLI command to App
 * :art: Based to Google code style
