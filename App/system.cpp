@@ -29,7 +29,7 @@ SystemError System::Initialize(void *ctx) {
     LOG_INFO("System init");
     i2c_bus_.Initialize(nullptr);
     io_.Initialize(nullptr);
-    return SystemError::kOK;
+    return SystemError::OK;
 }
 
 /**
@@ -66,11 +66,11 @@ SysGpio *System::GetIo() {
  * @return const char*
  */
 const char *System::ErrStringify(SystemError err) {
-    if (err == kTIMEOUT)
+    if (err == TIMEOUT)
         return "TIMEOUT";
-    else if (err == kBUSY)
+    else if (err == BUSY)
         return "BUSY";
-    else if (err == kERR)
+    else if (err == ERR)
         return "ERR";
     return "OK";
 }

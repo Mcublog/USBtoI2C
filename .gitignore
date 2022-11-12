@@ -14,3 +14,4 @@ SES/*.jlink
 .vscode/.cortex-debug.registers.state.json
 *.out
 bin/
+env/

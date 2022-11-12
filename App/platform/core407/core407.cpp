@@ -30,7 +30,7 @@ SystemError Core407::Initialize(void *ctx) {
     LOG_INFO("Core407 init");
     io_.Initialize(nullptr);
     i2c_bus_.Initialize(nullptr);
-    return SystemError::kOK;
+    return SystemError::OK;
 }
 
 /**

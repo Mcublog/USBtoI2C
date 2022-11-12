@@ -27,7 +27,7 @@
 IOError SysGpio::Initialize(void *pv) {
     UNUSED(pv);
     LOG_INFO("IO initialized");
-    return IOError::kIO_OK;
+    return IOError::IO_OK;
 }
 
 /**
@@ -38,5 +38,5 @@ IOError SysGpio::Initialize(void *pv) {
  */
 IOError SysGpio::LedWrite(bool state) {
     LOG_INFO("LED write: %d", state);
-    return IOError::kIO_OK;
+    return IOError::IO_OK;
 }

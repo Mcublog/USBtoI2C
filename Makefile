@@ -14,14 +14,35 @@ DEBUG_SRC := $(SRC)/debug
 RING_INC := Ring-Buffer
 RING_SRC := Ring-Buffer
 
-all: $(BIN)/$(EXECUTABLE)
+COBS_INC := cobs-c
+COBS_SRC := cobs-c/cobsr.c
 
-run: clean all
-	clear
-	./$(BIN)/$(EXECUTABLE)
+all:
+	make cobs
+	make $(BIN)/$(EXECUTABLE)
 
-$(BIN)/$(EXECUTABLE): $(SRC)/*.cpp $(RING_SRC)/*.c $(DEBUG_SRC)/*.c
-	$(CXX) $(CXX_FLAGS) -I$(INCLUDE) -I$(DEBUG_INC) -I$(RING_INC) $^ -o $@ $(LIBRARIES)
+cobs: $(COBS_SRC)
+	gcc -c -I$(COBS_INC) $^ -o $(BIN)/$@.a
+
+$(BIN)/$(EXECUTABLE): $(SRC)/*.cpp $(RING_SRC)/*.c $(DEBUG_SRC)/*.c $(BIN)/*.a
+	$(CXX) $(CXX_FLAGS) -I$(INCLUDE) -I$(DEBUG_INC) -I$(RING_INC) -I$(COBS_INC) $^ -o $@ $(LIBRARIES)
 
 clean:
+	-rm *.out
 	-rm $(BIN)/*
+
+rebuild: clean
+	clear
+	make cobs
+	make $(BIN)/$(EXECUTABLE)
+
+run: rebuild
+	$(BIN)/$(EXECUTABLE)
+
+run_tty: rebuild
+	$(BIN)/$(EXECUTABLE) /dev/ttyS10
+
+nullmodem:
+	-socat PTY,link=/dev/ttyS10,raw,echo=0 PTY,link=/dev/ttyS11,raw,echo=0 &
+	-sleep 0.1
+	-chmod 777 /dev/ttyS11 /dev/ttyS10

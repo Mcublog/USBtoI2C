@@ -18,7 +18,7 @@
 #include "ringbuffer.h"
 #include "usbd_cdc_if.h"
 //>>---------------------- Exported Variables
-extern ring_buffer_t input_ring;
+extern ring_buffer_t g_input_ring;
 //<<----------------------
 #else
 #pragma error("Undefined stdio stream")
@@ -36,7 +36,7 @@ int rt_get_char(void *handle, char *c, int len) {
 #if STDIO_STREAM == STDIO_USB_CDC
     (void)len;
     (void)handle;
-    return ring_buffer_dequeue(&input_ring, c);
+    return ring_buffer_dequeue(&g_input_ring, c);
 #elif STDIO_STREAM == STDIO_RTT
     return SEGGER_RTT_Read((unsigned)handle, c, len);
 #endif

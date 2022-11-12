@@ -8,18 +8,18 @@ extern "C" {
 
 typedef enum
 {
-    kTIMEOUT = -3,
-    kBUSY = -2,
-    kERR = -1,
-    kOK
+    TIMEOUT = -3,
+    BUSY = -2,
+    ERR = -1,
+    OK
 } SystemError;
 
 typedef enum
 {
-    kIO_TIMEOUT = -3,
-    kIO_BUSY = -2,
-    kIO_ERR = -1,
-    kIO_OK
+    IO_TIMEOUT = -3,
+    IO_BUSY = -2,
+    IO_ERR = -1,
+    IO_OK
 } IOError;
 
 #define UNUSED(X) (void)X
