@@ -8,6 +8,7 @@
 class GpBus : public IOBus {
    public:
     IOError Initialize(void *ctx);
+    IOError Reset();
     IOError IsReady(uint8_t adr);
     IOError Write(uint8_t adr, uint8_t reg, uint8_t regsize, uint8_t *data,
                   uint8_t len);

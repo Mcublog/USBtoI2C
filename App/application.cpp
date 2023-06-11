@@ -121,6 +121,12 @@ static const textToCmd_t textToCmdList[] = {
          LOG_RAW_INFO("%s\r\n", FW_VERSION);
          return true;
      }},
+    {"-rst", "reset I2C bus",
+     [](const char *text) -> bool {
+         (void)text;
+         sys.GetI2CBus()->Reset();
+         return true;
+     }},
 };
 
 static const uint32_t CMD_LIST_SIZE =  sizeof(textToCmdList) / sizeof(*textToCmdList);

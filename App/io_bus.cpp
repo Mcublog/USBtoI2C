@@ -29,6 +29,17 @@ IOError IOBus::Initialize(void *ctx) {
 }
 
 /**
+ * @brief Reset bus
+ *
+ * @return IOError
+ */
+IOError IOBus::Reset()
+{
+    LOG_INFO("I2C bus reset");
+    return IOError::IO_OK;
+}
+
+/**
  * @brief Default I2C device ready
  *
  * @param adr
