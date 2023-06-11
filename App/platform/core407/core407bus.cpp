@@ -44,6 +44,19 @@ IOError Core407Bus::Initialize(void *ctx) {
 }
 
 /**
+ * @brief Reset bus
+ *
+ * @return IOError
+ */
+IOError Core407Bus::Reset() {
+    if (i2c_handle_ == nullptr)
+        return IOError::IO_ERR;
+    HAL_I2C_DeInit(i2c_handle_);
+    HAL_I2C_Init(i2c_handle_);
+    return IOError::IO_OK;
+}
+
+/**
  * @brief
  *
  * @param adr

@@ -9,6 +9,7 @@ class IOBus
 {
   public:
     virtual IOError Initialize(void *ctx);
+    virtual IOError Reset();
     virtual IOError IsReady(uint8_t adr);
     virtual IOError Write(uint8_t adr, uint8_t reg, uint8_t regsize,
                               uint8_t *data, uint8_t len);
@@ -18,7 +19,7 @@ class IOBus
     static const char *ErrStringify(IOError err);
 
   protected:
-     static const uint32_t kI2CTimeoutMs = 10;
+     static const uint32_t kI2CTimeoutMs = 1;
 
   private:
      static const uint8_t kVirtualI2CDeviceAddress = 0x0C;
