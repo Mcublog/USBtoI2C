@@ -10,10 +10,11 @@ set(APP_DIR ${PROJECT_SOURCE_DIR}/App)
 
 set(APP_INCLUDES
     ${PROJECT_SOURCE_DIR}
+    ${APP_DIR}
     ${APP_DIR}/debug
 )
 
-file(GLOB_RECURSE APP_SOURCES ${APP_DIR}/*.cpp)
+file(GLOB APP_SOURCES ${APP_DIR}/*.cpp ${APP_DIR}/debug/*.c)
 
 set(LIBS_DIR ${PROJECT_SOURCE_DIR}/libs)
 set(PIRIT_SOURCE_DIR ${PROJECT_SOURCE_DIR}/pirit_2f/src/sources)

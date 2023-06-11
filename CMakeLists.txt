@@ -33,10 +33,7 @@ LOG_INFO("MCU target:......." ${F205_TARGET})
 LOG_INFO("PC target:........" ${DESKTOP_TARGET})
 
 add_subdirectory(config)
-# add_subdirectory(pirit_2f)
-# add_subdirectory(bootloader)
-# add_subdirectory(test_hw)
-# add_subdirectory(pirit_p)
+add_subdirectory(targets)
 
 # message("******* [Unit test list] *******")
 # enable_testing()

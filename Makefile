@@ -3,10 +3,11 @@ CXX_FLAGS := -Wall -Wextra -std=c++2a -ggdb -Wformat=0
 
 BIN		:= bin
 SRC		:= App
+DESKTOP_SRC	:= targets/desktop
 INCLUDE	:= App
 
 LIBRARIES	:=
-EXECUTABLE	:= main
+EXECUTABLE	:= pc_core_app
 
 DEBUG_INC := $(SRC)/debug
 DEBUG_SRC := $(SRC)/debug
@@ -24,7 +25,7 @@ all:
 cobs: $(COBS_SRC)
 	gcc -c -I$(COBS_INC) $^ -o $(BIN)/$@.a
 
-$(BIN)/$(EXECUTABLE): $(SRC)/*.cpp $(RING_SRC)/*.c $(DEBUG_SRC)/*.c $(BIN)/*.a
+$(BIN)/$(EXECUTABLE): $(DESKTOP_SRC)/*.cpp $(SRC)/*.cpp $(RING_SRC)/*.c $(DEBUG_SRC)/*.c $(BIN)/*.a
 	$(CXX) $(CXX_FLAGS) -I$(INCLUDE) -I$(DEBUG_INC) -I$(RING_INC) -I$(COBS_INC) $^ -o $@ $(LIBRARIES)
 
 clean:
