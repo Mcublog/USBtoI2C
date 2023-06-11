@@ -30,7 +30,7 @@ LOG_INFO("Host system:......" ${CMAKE_SYSTEM_NAME})
 LOG_INFO("Build type:......." ${CMAKE_BUILD_TYPE})
 LOG_INFO("MCU target:......." ${F205_BOOT_TARGET})
 LOG_INFO("MCU target:......." ${F205_TARGET})
-LOG_INFO("PC target:........" ${GD_MEM_TEST_TARGET})
+LOG_INFO("PC target:........" ${DESKTOP_TARGET})
 
 add_subdirectory(config)
 # add_subdirectory(pirit_2f)
