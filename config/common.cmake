@@ -17,9 +17,6 @@ set(APP_INCLUDES
 file(GLOB APP_SOURCES ${APP_DIR}/*.cpp ${APP_DIR}/debug/*.c)
 
 set(LIBS_DIR ${PROJECT_SOURCE_DIR}/libs)
-set(PIRIT_SOURCE_DIR ${PROJECT_SOURCE_DIR}/pirit_2f/src/sources)
-set(HW_DIR ${STM32F401_CUBE_PATH}/hw)
-set(TEST_HW_DIR ${STM32F401_CUBE_PATH}/test_hw)
 
 set(HAL_INCLUDE_DIRS
     # Put here your include dirs, one in each line,
