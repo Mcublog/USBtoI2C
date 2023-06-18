@@ -78,7 +78,7 @@ static const textToCmd_t textToCmdList[] = {
          uint16_t MemAddSize;
          uint8_t data[I2C_MAX_DATA_SIZE] = {0};
          uint16_t Size;
-         int sscanf_res = sscanf(text, "%hx %hx %hd %hd %hd", &DevAddress,
+         int sscanf_res = sscanf(text, "%hx %hx %hd %hd %hhd", &DevAddress,
                                  &MemAddress, &MemAddSize, &Size, data);
          if (sscanf_res < 5) {
              return false;

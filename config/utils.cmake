@@ -10,28 +10,38 @@ function(LOG_WARN text)
     message("[WARN] " ${ARGV})
 endfunction()
 
-function(create_bootable_bin target postfix)
-    set(OUTPUT_FILENAME PiritF_${postfix}_${VER_MAJOR}.${VER_MINOR}.${VER_PATCH})
-
+function(build_jlink_script target)
     add_custom_command(TARGET ${target}
         POST_BUILD
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-        COMMAND ${CMAKE_OBJCOPY} ARGS -O ihex   -I elf32-littlearm ${target} ${target}.hex
-        COMMAND ${CMAKE_OBJCOPY} ARGS -O binary -I elf32-littlearm ${target} ${target}.bin
-    )
+        COMMAND ${CMAKE_COMMAND} -E copy
+        ARGS ${target}.hex ${PROJECT_SOURCE_DIR}/build/output/${target}.hex)
 
-    if(${CMAKE_HOST_SYSTEM_NAME} MATCHES "Linux")
-        add_custom_command(TARGET ${target}
-            POST_BUILD
-            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-            COMMAND cat ARGS ${target}.bin "${PROJECT_SOURCE_DIR}/scripts/end4.bin" > ../${OUTPUT_FILENAME}.bin
-        )
-    else()
-        add_custom_command(TARGET ${target}
-            POST_BUILD
-            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-            COMMAND copy ARGS /b ${target}.bin + "${PROJECT_SOURCE_DIR}/scripts/end4.bin" ${OUTPUT_FILENAME}.bin
-        )
+    configure_file(${PROJECT_SOURCE_DIR}/config/burn.jlink.in
+        ${CMAKE_CURRENT_BINARY_DIR}/${target}.jlink
+        ESCAPE_QUOTES)
+endfunction()
+
+function(get_git_hash hash_value)
+    execute_process(
+        COMMAND git log -1 --format=%h
+        WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
+        OUTPUT_VARIABLE GIT_HASH
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    set(${hash_value} ${GIT_HASH} PARENT_SCOPE)
+    if(GIT_HASH STREQUAL "")
+        set(GIT_HASH "unknown")
     endif()
+endfunction()
+
+function(set_build_mark output_dir hash_value timestamp)
+
+    set(GIT_HASH ${hash_value})
+    set(BUILD_TIMESTAMP ${timestamp})
+
+    configure_file("get_build_marks.c.in"
+        ${output_dir}/get_build_marks.c
+        ESCAPE_QUOTES)
 
 endfunction()
